@@ -1,0 +1,8 @@
+.content-collections/
+.next/
+.venv/
+node_modules/
+out/
+public/feed.xml
+public/search.json
+public/tags/

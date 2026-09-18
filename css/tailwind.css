@@ -1,0 +1,320 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Core theme configuration */
+@theme {
+  /* Font families */
+  --font-sans:
+    var(--font-inter), Arial, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
+  --font-serif-italic: var(--font-source-serif-italic), Georgia, 'Times New Roman', serif;
+  --font-mono: var(--font-jetbrains-mono), 'Courier New', ui-monospace, monospace;
+
+  /* Fluid type scale */
+  --text-caption: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --text-small: clamp(0.9375rem, 0.91rem + 0.12vw, 1rem);
+  --text-body: clamp(1.0625rem, 1.02rem + 0.18vw, 1.1875rem);
+  --text-lead: clamp(1.25rem, 1.17rem + 0.32vw, 1.5rem);
+  --text-heading-4: clamp(1.375rem, 1.27rem + 0.43vw, 1.75rem);
+  --text-heading-3: clamp(1.625rem, 1.45rem + 0.72vw, 2.25rem);
+  --text-heading-2: clamp(2rem, 1.7rem + 1.2vw, 3rem);
+  --text-heading-1: clamp(2.5rem, 2rem + 2vw, 4.25rem);
+  --text-display: clamp(3rem, 2.3rem + 2.8vw, 5.5rem);
+
+  /* Geometric rhythm scale */
+  --spacing-rhythm-1: 0.25rem;
+  --spacing-rhythm-2: 0.5rem;
+  --spacing-rhythm-3: 0.75rem;
+  --spacing-rhythm-4: 1rem;
+  --spacing-rhythm-5: 1.5rem;
+  --spacing-rhythm-6: 2rem;
+  --spacing-rhythm-7: 3rem;
+  --spacing-rhythm-8: 4rem;
+  --spacing-rhythm-9: 6rem;
+
+  /* Motion */
+  --duration-instant: 50ms;
+  --duration-fast: 120ms;
+  --duration-normal: 180ms;
+  --duration-slow: 200ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+
+  /* Observatory colors */
+  --color-void-50: oklch(0.97 0.008 255);
+  --color-void-100: oklch(0.93 0.012 255);
+  --color-void-200: oklch(0.85 0.018 255);
+  --color-void-300: oklch(0.74 0.025 255);
+  --color-void-400: oklch(0.62 0.032 255);
+  --color-void-500: oklch(0.5 0.038 255);
+  --color-void-600: oklch(0.4 0.04 255);
+  --color-void-700: oklch(0.31 0.038 255);
+  --color-void-800: oklch(0.24 0.034 255);
+  --color-void-900: oklch(0.18 0.03 255);
+  --color-void-950: oklch(0.12 0.025 255);
+
+  --color-plate-50: oklch(0.985 0.008 90);
+  --color-plate-100: oklch(0.965 0.01 90);
+  --color-plate-200: oklch(0.925 0.013 90);
+  --color-plate-300: oklch(0.86 0.016 90);
+  --color-plate-400: oklch(0.75 0.019 90);
+  --color-plate-500: oklch(0.62 0.02 90);
+  --color-plate-600: oklch(0.5 0.019 90);
+  --color-plate-700: oklch(0.39 0.017 90);
+  --color-plate-800: oklch(0.29 0.014 90);
+  --color-plate-900: oklch(0.21 0.011 90);
+  --color-plate-950: oklch(0.15 0.008 90);
+
+  --color-starlight-50: oklch(0.97 0.025 225);
+  --color-starlight-100: oklch(0.92 0.05 225);
+  --color-starlight-200: oklch(0.84 0.085 225);
+  --color-starlight-300: oklch(0.75 0.11 225);
+  --color-starlight-400: oklch(0.65 0.12 225);
+  --color-starlight-500: oklch(0.54 0.115 225);
+  --color-starlight-600: oklch(0.47 0.105 225);
+  --color-starlight-700: oklch(0.39 0.09 225);
+  --color-starlight-800: oklch(0.32 0.072 225);
+  --color-starlight-900: oklch(0.26 0.055 225);
+  --color-starlight-950: oklch(0.18 0.038 225);
+
+  --color-primary-50: var(--color-starlight-50);
+  --color-primary-100: var(--color-starlight-100);
+  --color-primary-200: var(--color-starlight-200);
+  --color-primary-300: var(--color-starlight-300);
+  --color-primary-400: var(--color-starlight-400);
+  --color-primary-500: var(--color-starlight-500);
+  --color-primary-600: var(--color-starlight-600);
+  --color-primary-700: var(--color-starlight-700);
+  --color-primary-800: var(--color-starlight-800);
+  --color-primary-900: var(--color-starlight-900);
+  --color-primary-950: var(--color-starlight-950);
+
+  /* Semantic colors: photographic plate (light) */
+  --color-surface: var(--color-plate-50);
+  --color-surface-raised: var(--color-plate-100);
+  --color-ink: var(--color-void-950);
+  --color-ink-muted: var(--color-void-600);
+  --color-accent: var(--color-starlight-700);
+  --color-accent-hover: var(--color-starlight-800);
+  --color-focus: var(--color-starlight-600);
+  --color-boundary: var(--color-void-500);
+  --color-code-surface: var(--color-void-950);
+  --color-code-surface-raised: var(--color-void-900);
+  --color-code-ink: var(--color-plate-100);
+  --color-code-muted: var(--color-plate-500);
+
+  --color-gray-50: oklch(0.985 0.002 247.839);
+  --color-gray-100: oklch(0.967 0.003 264.542);
+  --color-gray-200: oklch(0.928 0.006 264.531);
+  --color-gray-300: oklch(0.872 0.01 258.338);
+  --color-gray-400: oklch(0.707 0.022 261.325);
+  --color-gray-500: oklch(0.551 0.027 264.364);
+  --color-gray-600: oklch(0.446 0.03 256.802);
+  --color-gray-700: oklch(0.373 0.034 259.733);
+  --color-gray-800: oklch(0.278 0.033 256.848);
+  --color-gray-900: oklch(0.21 0.034 264.665);
+  --color-gray-950: oklch(0.13 0.028 261.692);
+
+  /* Line heights */
+  --line-height-11: 2.75rem;
+  --line-height-12: 3rem;
+  --line-height-13: 3.25rem;
+  --line-height-14: 3.5rem;
+
+  /* Z-index values */
+  --z-60: 60;
+  --z-70: 70;
+  --z-80: 80;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  .dark {
+    --color-surface: var(--color-void-950);
+    --color-surface-raised: var(--color-void-900);
+    --color-ink: var(--color-plate-50);
+    --color-ink-muted: var(--color-plate-400);
+    --color-accent: var(--color-starlight-300);
+    --color-accent-hover: var(--color-starlight-200);
+    --color-focus: var(--color-starlight-400);
+    --color-boundary: var(--color-plate-600);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-body);
+    line-height: 1.65;
+  }
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  a,
+  button {
+    outline-color: var(--color-primary-500);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid;
+    border-radius: var(--radius-sm);
+    outline-color: var(--color-primary-500);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .prose {
+    max-width: 68ch;
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    font-size: var(--text-body);
+    font-variant-numeric: oldstyle-nums proportional-nums;
+
+    & a {
+      color: var(--color-accent);
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.16em;
+      &:hover {
+        color: var(--color-accent-hover);
+      }
+      & code {
+        color: inherit;
+      }
+    }
+    & :where(h1, h2, h3, h4, h5, h6) {
+      color: var(--color-ink);
+      font-family: var(--font-sans);
+    }
+    & :where(h1, h2) {
+      font-weight: 700;
+      letter-spacing: var(--tracking-tight);
+    }
+    & h3 {
+      font-weight: 600;
+    }
+    & :where(em, i) {
+      font-family: var(--font-serif-italic);
+    }
+    & :where(blockquote) {
+      border-inline-start-color: var(--color-boundary);
+      color: var(--color-ink-muted);
+    }
+    & :where(code):not(pre code) {
+      color: var(--color-accent);
+    }
+    & :where(pre) {
+      max-width: 100%;
+      overflow-x: auto;
+      background-color: var(--color-code-surface);
+      color: var(--color-code-ink);
+    }
+    & :where(th, td) {
+      border-color: var(--color-boundary);
+    }
+    & :where(figcaption, .footnotes, .csl-entry) {
+      color: var(--color-ink-muted);
+    }
+    & :where(.katex-display) {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+  }
+
+  .prose-invert {
+    color: var(--color-ink);
+  }
+}
+
+.task-list-item::before {
+  @apply hidden;
+}
+
+.task-list-item {
+  @apply list-none;
+}
+
+.footnotes {
+  @apply mt-12 border-t border-gray-200 pt-8 dark:border-gray-700;
+}
+
+.data-footnote-backref {
+  @apply no-underline;
+}
+
+.csl-entry {
+  @apply my-5;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* https://stackoverflow.com/questions/61083813/how-to-avoid-internal-autofill-selected-style-to-be-applied */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
+}
+
+.katex-display {
+  overflow: auto hidden;
+}
+
+.content-header-link {
+  opacity: 0;
+  margin-left: -24px;
+  padding-right: 4px;
+}
+
+.content-header:hover .content-header-link,
+.content-header-link:hover {
+  opacity: 1;
+}
+
+.linkicon {
+  display: inline-block;
+  vertical-align: middle;
+}
