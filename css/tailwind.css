@@ -3,6 +3,14 @@
 @plugin '@tailwindcss/typography';
 @custom-variant dark (&:where(.dark, .dark *));
 
+html.dark .markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-starlight-300);
+}
+
+html.dark .markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-starlight-300);
+}
+
 /* Core theme configuration */
 @theme {
   /* Font families */

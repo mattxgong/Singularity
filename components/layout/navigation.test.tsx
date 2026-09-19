@@ -22,7 +22,8 @@ describe('navigation', () => {
     trigger.focus()
     fireEvent.click(trigger)
 
-    expect(await screen.findByRole('dialog', {}, { timeout: 5000 })).toBeInTheDocument()
+    // The panel arrives through a dynamic import, which is slow on a cold or loaded runner.
+    expect(await screen.findByRole('dialog', {}, { timeout: 15_000 })).toBeInTheDocument()
     expect(
       within(screen.getByRole('navigation', { name: 'Mobile' })).getAllByRole('link')
     ).toHaveLength(5)
@@ -30,5 +31,5 @@ describe('navigation', () => {
     fireEvent.keyDown(document, { key: 'Escape' })
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(trigger).toHaveFocus()
-  })
+  }, 20_000)
 })

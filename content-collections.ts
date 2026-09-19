@@ -116,7 +116,7 @@ function writeArtifacts<T extends ArtifactBlog>(allBlogs: T[]) {
       id: `project-${project.slug}`,
       title: project.title,
       summary: `${project.tagline} ${project.outcome}`,
-      href: project.links[0]?.href ?? '/projects',
+      href: `/projects/${project.slug}`,
       kind: 'project',
     }))
     writeFileSync(`public/${searchPath}`, JSON.stringify([...postDocuments, ...projectDocuments]))

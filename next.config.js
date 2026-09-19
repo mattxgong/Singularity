@@ -14,16 +14,23 @@ try {
   // The application remains analytics-free when the deployment URL is invalid.
 }
 
-// You might need to insert additional domains in script-src if you are using external services
+const developmentScriptSource = process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"
+
+// unsafe-inline remains accepted because nonce-based scripts require middleware and would
+// forfeit the site's fully static deployment model.
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app ${umamiOrigin};
+  script-src 'self' 'unsafe-inline'${developmentScriptSource} giscus.app ${umamiOrigin};
   style-src 'self' 'unsafe-inline';
-  img-src * blob: data:;
-  media-src *.s3.amazonaws.com;
+  img-src 'self' blob: data:;
+  media-src 'none';
   connect-src 'self' ${umamiOrigin};
   font-src 'self';
-  frame-src giscus.app
+  frame-src giscus.app;
+  frame-ancestors 'none';
+  base-uri 'self';
+  form-action 'self';
+  object-src 'none'
 `
 
 const securityHeaders = [
@@ -89,6 +96,7 @@ module.exports = () => {
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     images: {
+      formats: ['image/avif', 'image/webp'],
       unoptimized,
     },
     async headers() {

@@ -2306,6 +2306,7 @@ Risks and rollback. `sameAs` on `Person` publishes social profiles as machine-re
 | Size       | M               |
 | Depends on | SINGULARITY-008 |
 | Unlocks    | SINGULARITY-059 |
+| Status     | Complete        |
 
 Objective. Expand the real Vitest foundation from `SINGULARITY-008` to cover the pure logic that the finished site depends on.
 
@@ -2333,6 +2334,12 @@ yarn test
 yarn typecheck
 ```
 
+Implementation evidence, 2026-09-19.
+
+- Existing tests cover date and period formatting, post navigation and related-post ranking, SEO builders, data validators, class merging, and primitive behavior.
+- New focused tests cover content projection, immutable date sorting, production draft filtering, and table-of-contents extraction with duplicate and formatted headings.
+- The complete Vitest suite, TypeScript check, lint, and formatting check pass. No snapshot tests were added.
+
 Risks and rollback. Vitest needs the same path aliases as `tsconfig.json`, which is the usual first failure. Rollback: revert the config.
 
 ### SINGULARITY-054 Playwright setup
@@ -2343,6 +2350,7 @@ Risks and rollback. Vitest needs the same path aliases as `tsconfig.json`, which
 | Size       | M                                |
 | Depends on | all routes existing              |
 | Unlocks    | SINGULARITY-055, SINGULARITY-056 |
+| Status     | Complete                         |
 
 Objective. Install end-to-end testing against a production build.
 
@@ -2367,6 +2375,12 @@ Validation.
 yarn test:e2e
 ```
 
+Implementation evidence, 2026-09-19.
+
+- Playwright 1.63.0 runs against a production build served on an isolated local port.
+- Desktop Chromium and mobile Safari execute seven top-level route checks each. All 14 checks passed in 50.8 seconds, including response status and primary-heading assertions.
+- The test command builds, starts, and tears down the production server. Failure traces, screenshots, videos, and reports are excluded from version control.
+
 Risks and rollback. Browser downloads make the first continuous integration run slow; cache them. Rollback: revert the config.
 
 ### SINGULARITY-055 Journey end-to-end specs
@@ -2377,6 +2391,7 @@ Risks and rollback. Browser downloads make the first continuous integration run 
 | Size       | L               |
 | Depends on | SINGULARITY-054 |
 | Unlocks    | SINGULARITY-059 |
+| Status     | Complete        |
 
 Objective. Encode journeys J1 through J5 as executable specifications, so that a regression in the site's purpose fails the build.
 
@@ -2409,6 +2424,20 @@ yarn build
 yarn test:e2e
 ```
 
+Implementation evidence, 2026-09-19.
+
+- All five journey specifications pass against the production server on their required desktop or mobile projects.
+- The authoring fixture is created and removed by a `finally` cleanup path, including after failures.
+- Browser assertions cover the initial mobile viewport, project metadata, deferred comments, resume navigation and download, generated authoring artifacts, and absence of North American phone-number patterns.
+
+Correction, 2026-09-19. The first implementation shipped no screenshot baselines, so two acceptance criteria were unmet without being recorded.
+
+- `tests/visual/journey-regions.spec.ts` now holds exactly four reviewed baselines: the J1 initial mobile viewport, the project metadata block, and a representative prose block in each theme. Dates are masked and animations are disabled.
+- Replacing the light prose baseline with the dark render failed the assertion at a 0.76 pixel ratio, and regenerating it restored the suite. Updates require the explicit `yarn test:visual:update` command.
+- Baselines are platform-specific, so the visual suite is a reviewed local gate rather than a continuous integration job, and `ignoreSnapshots` keeps screenshot assertions inert in the other suites.
+- The privacy assertion previously read only `body.innerText`. It now also inspects link and metadata attributes and structured data, rejects any `tel:` link, and uses the stricter North American pattern from `scripts/check-sensitive-data.py` so raw-attribute scanning does not produce false positives. Per-route soft assertions report every offending route instead of stopping at the first.
+- J1, J5, and the policy specs are scoped to a single browser engine, which removes duplicate runs of journeys that do not vary by project.
+
 Risks and rollback. Above-the-fold assertions are brittle against copy changes. Assert visibility within the viewport, not exact pixel positions. Rollback: mark a failing spec skipped with a linked issue rather than deleting it.
 
 ### SINGULARITY-056 Accessibility test suite
@@ -2419,6 +2448,7 @@ Risks and rollback. Above-the-fold assertions are brittle against copy changes. 
 | Size       | M                                |
 | Depends on | SINGULARITY-022, SINGULARITY-054 |
 | Unlocks    | SINGULARITY-059                  |
+| Status     | Complete                         |
 
 Objective. Assert zero serious or critical accessibility violations on every route, in both themes.
 
@@ -2445,6 +2475,18 @@ Validation.
 yarn test:a11y
 ```
 
+Implementation evidence, 2026-09-19.
+
+- Every generated content route passes axe scans in light and dark themes on desktop Chromium and mobile Safari with zero serious or critical violations.
+- Keyboard coverage verifies skip-link focus, mobile-menu trapping and restoration, and code-group tabs. WebKit skips only the assertion that depends on Safari's optional full-keyboard-navigation preference.
+- A measured dark-theme callout contrast failure was corrected with a scoped token override and the complete suite passes.
+
+Correction, 2026-09-19. The sweep was a single test covering both themes, so the first failure hid every later route, and the route list came from a sitemap that omitted tag pages.
+
+- The scan is now one test per theme, with a named step per route and soft assertions, so a single run reports every failing route and the two themes execute in parallel.
+- `app/sitemap.ts` emits tag routes, which widens both the accessibility sweep and the privacy scan from twelve routes to fifteen.
+- The theme assertion matches the `light` or `dark` class as a whole word rather than as a substring.
+
 Risks and rollback. Third-party iframes such as Giscus will produce violations that cannot be fixed here. Exclude the iframe from the scan and note it. Rollback: not applicable; failures are fixed, not reverted.
 
 ### SINGULARITY-057 Client boundary guard
@@ -2455,6 +2497,7 @@ Risks and rollback. Third-party iframes such as Giscus will produce violations t
 | Size       | S               |
 | Depends on | SINGULARITY-018 |
 | Unlocks    | SINGULARITY-059 |
+| Status     | Complete        |
 
 Objective. Prevent the most likely architectural regression: a well-meaning change adding `'use client'` high in the component tree.
 
@@ -2462,14 +2505,14 @@ Scope. One check plus its allowlist. Non-goals: a general architecture linter.
 
 Files. `scripts/check-client-boundary.mjs`, [package.json](../../../package.json).
 
-Implementation notes. `Evidence`: the baseline is seven client components, and [architecture.md](architecture.md) permits exactly eleven after the transformation. The check scans for the directive and fails if any file outside the allowlist carries it. The allowlist lives in the script with a comment explaining each entry, so adding one is a deliberate, reviewable act.
+Implementation notes. `Evidence`: the baseline was seven client components, and the corrected [architecture.md](architecture.md) inventory permits exactly fourteen after the transformation. The check scans for the directive and fails if any file outside the allowlist carries it. The allowlist lives in the script with a comment explaining each entry, so adding one is a deliberate, reviewable act.
 
 Acceptance criteria.
 
 - Fails when an unlisted file gains the directive.
 - Passes on the current tree.
 - The failure message names the file and links to the architecture rule.
-- The allowlist has exactly the eleven permitted entries, each with a comment.
+- The allowlist has exactly the fourteen permitted entries, each with a comment.
 - Runs in under 2 seconds.
 - Wired into continuous integration.
 
@@ -2481,6 +2524,18 @@ node scripts/check-client-boundary.mjs
 
 Then add the directive to a test file and confirm it fails.
 
+Implementation evidence, 2026-09-19.
+
+- The guard finds the fourteen client components listed in the corrected architecture inventory and completes in 1.06 seconds.
+- A temporary unlisted client file caused the check to fail with the file path and a link to the governing architecture section. The probe was removed, and the clean-tree check passes.
+- The guard is exposed as `yarn check:client-boundary` for the continuous integration workflow in `SINGULARITY-059`.
+
+Correction, 2026-09-19. The directive pattern carried the multiline flag, so a quoted `'use client'` on any line of any file counted as a boundary, and the walk covered the whole working tree including `test-results/` and `playwright-report/`.
+
+- The pattern now anchors to the head of the file, skipping leading comments, which is the only position where the directive has meaning.
+- The walk is scoped to the `app`, `components`, `data`, `layouts`, and `lib` roots instead of excluding directories by name.
+- The probe was repeated after the change: the guard fails on an unlisted client component and reports fourteen approved files once it is removed.
+
 Risks and rollback. A guard that is too easy to satisfy by editing the allowlist is theatre. The comment requirement is the friction that makes it meaningful. Rollback: remove from continuous integration.
 
 ### SINGULARITY-058 Lighthouse CI and performance budgets
@@ -2491,6 +2546,7 @@ Risks and rollback. A guard that is too easy to satisfy by editing the allowlist
 | Size       | M                                                 |
 | Depends on | SINGULARITY-001, SINGULARITY-054, SINGULARITY-062 |
 | Unlocks    | SINGULARITY-059                                   |
+| Status     | Implementation complete; CI validation pending    |
 
 Objective. Turn the budgets in [README.md](README.md) from stated targets into enforced gates.
 
@@ -2519,6 +2575,18 @@ yarn build
 npx lhci autorun
 ```
 
+Implementation evidence and privacy decision, 2026-09-19.
+
+- Lighthouse CI runs three default mobile audits for the home page, a representative blog post, a project detail, and the resume. Assertions enforce Performance 95, Accessibility 100, LCP below 1.8 seconds, CLS below 0.05, TBT below 200 milliseconds, and total transfer below 1 MB.
+- Speed Insights renders only when `VERCEL_ENV` is `production`, so local and preview deployments send no metrics. Vercel documents each anonymous data point as route and URL, network speed, browser, device and operating system, country, Web Vital and attribution, SDK version, and server-received time. It does not retain data that identifies a visitor or reconstructs a cross-page session.
+- No consent banner or additional notice is required for this anonymous performance-only enablement. Revisit that decision before adding visitor analytics, persistent identifiers, custom events, or a different processor.
+- The local audit reached Lighthouse with Playwright Chromium, but the managed Windows environment denied cleanup of Chrome's temporary profile before LHCI assertions ran. The Linux continuous integration job is the authoritative complete run.
+
+Correction, 2026-09-19. Two details did not match the stated intent.
+
+- Median aggregation across the three runs was left to the tool default. `aggregationMethod` is now declared explicitly so the criterion is enforced rather than inherited.
+- Reports were uploaded to `temporary-public-storage`, which publishes full renderings and screenshots of every audited page to a public bucket. That sits badly beside a redacted resume and a phone-number regression test. Reports now write to `.lighthouseci/reports` and travel as a private workflow artifact.
+
 Risks and rollback. Continuous integration runners are slower and noisier than local machines, which produces flaky failures. Tune thresholds against observed runner variance, and do not weaken them below the stated budgets without recording the reason. Rollback: switch assertions to warnings temporarily, with an issue.
 
 ### SINGULARITY-059 Continuous integration workflow
@@ -2529,6 +2597,7 @@ Risks and rollback. Continuous integration runners are slower and noisier than l
 | Size       | M                                                                                                                     |
 | Depends on | SINGULARITY-008, SINGULARITY-053, SINGULARITY-055, SINGULARITY-056, SINGULARITY-057, SINGULARITY-058, SINGULARITY-061 |
 | Unlocks    | SINGULARITY-067                                                                                                       |
+| Status     | Implementation complete; pull-request validation pending                                                              |
 
 Objective. Run every quality gate automatically on every pull request. The repository currently has no quality gate at all.
 
@@ -2554,16 +2623,31 @@ Validation.
 
 Open a pull request with a deliberate lint error and confirm the run fails at the lint job.
 
+Implementation evidence, 2026-09-19.
+
+- The workflow runs on pull requests and pushes to `main`, with static checks, unit tests, and the production build ordered before the browser and content jobs.
+- All ten required checks are present. The Playwright browser cache is keyed by operating system and lockfile, and the verified build is shared through a one-day artifact.
+- The former GitHub Pages push trigger is removed; fallback deployment remains available through `workflow_dispatch`.
+- Workflow diagnostics pass locally. Cache effectiveness, duration, and deliberate failure behavior require the first pull-request run.
+
+Correction, 2026-09-19. The first workflow shipped a stale artifact path and left the strongest privacy gate outside continuous integration.
+
+- The build artifact listed `public/sitemap.xml`, which nothing generates, and omitted the per-tag feeds. It now carries `.next`, the feed, the search index, and `public/tags`.
+- `yarn check:sensitive` runs in the static-checks job against a pinned Python toolchain, so the redacted resume is verified on every pull request rather than by hand.
+- The end-to-end job no longer rebuilds twice. `scripts/run-e2e.mjs` skips its restorative build when `CI` is set, because the runner discards the workspace anyway. The job still builds its own output, since the J5 authoring fixture has to exist before the build.
+- Every action is pinned to a commit SHA with the tag in a trailing comment, every job declares `timeout-minutes`, and in-progress cancellation is limited to pull requests so a push to `main` is never interrupted.
+
 Risks and rollback. Yarn 3 with a `.yarn` directory needs the right cache configuration or continuous integration will reinstall everything each run. Rollback: disable the workflow.
 
 ### SINGULARITY-060 Tighten the Content Security Policy
 
-| Field      | Value                       |
-| ---------- | --------------------------- |
-| Phase      | P6                          |
-| Size       | M                           |
-| Depends on | a deployed preview existing |
-| Unlocks    | SINGULARITY-067             |
+| Field      | Value                                                   |
+| ---------- | ------------------------------------------------------- |
+| Phase      | P6                                                      |
+| Size       | M                                                       |
+| Depends on | a deployed preview existing                             |
+| Unlocks    | SINGULARITY-067                                         |
+| Status     | Implementation complete; external preview check pending |
 
 Objective. Narrow the policy from the starter's permissive defaults to the target in [architecture.md](architecture.md).
 
@@ -2596,6 +2680,17 @@ yarn build
 
 Then deploy a preview and walk every route with the console open.
 
+Implementation evidence, 2026-09-19.
+
+- Production removes `unsafe-eval`, narrows image, media, and connection sources, and adds `frame-ancestors`, `base-uri`, `form-action`, and `object-src`. Development retains `unsafe-eval` for Next.js tooling.
+- The retained `unsafe-inline` source has an adjacent static-deployment rationale. The production build succeeds with the tightened policy.
+- Console checks for every route, click-to-load Giscus, configured Umami, and kbar remain blocked on a real preview URL.
+
+Correction, 2026-09-19. Waiting on a manual preview walk left the policy unguarded against regression.
+
+- `tests/e2e/security.spec.ts` asserts the response header directive by directive, confirms `unsafe-eval` never reaches production, and replays every sitemap route while collecting `securitypolicyviolation` events. Fifteen routes report no violation against the production server.
+- The manual preview walk still owns what the automated check cannot reach: Giscus after a click, a configured Umami beacon, and the deployed host's own header handling.
+
 Risks and rollback. A too-narrow `connect-src` breaks analytics silently, since a blocked beacon produces no visible symptom. Check the console explicitly. Rollback: revert to the previous policy string.
 
 ### SINGULARITY-061 Internal link and content-integrity checker
@@ -2606,6 +2701,7 @@ Risks and rollback. A too-narrow `connect-src` breaks analytics silently, since 
 | Size       | S                                |
 | Depends on | SINGULARITY-036, SINGULARITY-045 |
 | Unlocks    | SINGULARITY-059                  |
+| Status     | Complete                         |
 
 Objective. Prevent broken links, anchors, and project-to-MDX references after a slug or content change.
 
@@ -2633,6 +2729,17 @@ yarn build
 node scripts/check-links.mjs
 ```
 
+Implementation evidence, 2026-09-19.
+
+- The checker validates links and fragments across 19 generated routes, project-to-case-study integrity, and exact published membership in search, sitemap, and RSS artifacts.
+- Drafts and templates are excluded by generating content in production mode. External links are counted without network requests.
+- The check passes in 1.95 seconds.
+
+Correction, 2026-09-19. Membership was asserted for posts only, although projects appear in both the search index and the sitemap. Extending the check to project routes immediately found a real defect.
+
+- Every project record in `public/search.json` pointed at `/projects`, because the generator fell back to the list page whenever a project had no first link. Searching for a project name landed the reader on the index instead of the case study. `content-collections.ts` now derives the href from the project slug.
+- The checker asserts that each `/projects/<slug>/` route appears exactly once in the search index and once in the sitemap, and reports 19 routes, one published post, and three projects.
+
 Risks and rollback. Rollback: remove from continuous integration.
 
 ### SINGULARITY-062 Image optimization pass
@@ -2643,6 +2750,7 @@ Risks and rollback. Rollback: remove from continuous integration.
 | Size       | M                                |
 | Depends on | SINGULARITY-035, SINGULARITY-037 |
 | Unlocks    | SINGULARITY-058                  |
+| Status     | Complete                         |
 
 Objective. Bring every image within budget with correct dimensions, formats, and loading behaviour.
 
@@ -2672,6 +2780,18 @@ yarn serve
 ```
 
 Then run Lighthouse and check the network panel for image weight.
+
+Implementation evidence, 2026-09-19.
+
+- Next Image negotiates AVIF and WebP, and no `picsum.photos` remote pattern remains.
+- Browser tests verify non-empty alternative-text attributes, explicit dimensions, lazy loading, a 400 KB per-page transfer budget, and zero image-attributed layout shift on representative post and project routes.
+- Both image checks pass in desktop Chromium.
+
+Correction, 2026-09-19. The test contradicted the criterion it was meant to enforce.
+
+- It required every image in `main` to declare `loading="lazy"`, which forbids the `priority` flag that `layouts/post-layout.tsx` correctly sets on a banner. The check passed only because the representative post uses no banner; the first banner post would have failed it, and the obvious repair would have been to delete the optimization. The rule is now that at most one image may opt out of lazy loading and it must begin inside the initial viewport.
+- The alternative-text assertion checks for a present attribute rather than a non-empty one, since decorative images require an empty `alt`. The earlier wording above described the wrong behavior.
+- WebKit does not implement the `layout-shift` entry type, so the layout-shift assertion was reading a false zero on mobile Safari. It is now scoped to Chromium and the skip is stated rather than implied.
 
 Risks and rollback. Rollback: restore the original images.
 

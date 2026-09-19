@@ -3,6 +3,7 @@ import 'css/fonts.css'
 import 'remark-github-blockquote-alert/alert.css'
 
 import localFont from 'next/font/local'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import Analytics from '@/components/Analytics'
 import { siteMetadata } from '@/data/index'
 import { ThemeProviders } from './theme-providers'
@@ -129,6 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProviders>
           <Analytics />
           {children}
+          {process.env.VERCEL_ENV === 'production' && <SpeedInsights />}
         </ThemeProviders>
       </body>
     </html>

@@ -1,0 +1,33 @@
+{
+  "ci": {
+    "collect": {
+      "numberOfRuns": 3,
+      "startServerCommand": "yarn serve --port 3200",
+      "startServerReadyPattern": "Ready",
+      "url": [
+        "http://127.0.0.1:3200/",
+        "http://127.0.0.1:3200/blog/designing-observable-multi-agent-workflows/",
+        "http://127.0.0.1:3200/projects/robotics-challenge/",
+        "http://127.0.0.1:3200/resume/"
+      ],
+      "settings": {
+        "chromeFlags": "--headless --no-sandbox --disable-background-networking --disable-component-update --disable-crash-reporter --disable-dev-shm-usage --no-first-run"
+      }
+    },
+    "assert": {
+      "aggregationMethod": "median",
+      "assertions": {
+        "categories:accessibility": ["error", { "minScore": 1 }],
+        "categories:performance": ["error", { "minScore": 0.95 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 1800 }],
+        "total-blocking-time": ["error", { "maxNumericValue": 200 }],
+        "total-byte-weight": ["error", { "maxNumericValue": 1024000 }]
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci/reports"
+    }
+  }
+}

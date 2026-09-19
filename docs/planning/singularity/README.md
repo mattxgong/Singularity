@@ -2,7 +2,7 @@
 title: Singularity Planning Index
 description: Executive summary, goals, scope, and document status for transforming the Tailwind Next.js starter blog into the Singularity personal portfolio and technical blog
 author: Matthew Gong
-ms.date: 2026-09-17
+ms.date: 2026-09-19
 ms.topic: overview
 keywords:
   - singularity
@@ -20,11 +20,11 @@ This planning set is the single source of truth for the transformation.
 
 ## Current implementation stage
 
-Phases P0 through P5 are implemented. `SINGULARITY-001` captured the baseline, `SINGULARITY-002` selected Content Collections, `SINGULARITY-003` replaced Contentlayer2, and `SINGULARITY-069` replaced Pliny with focused first-party components and maintained packages. The design foundations, application shell, portfolio surfaces, blog experience, and all five optional integrations followed. Phase P6, quality hardening, and phase P7, launch readiness, have not started.
+Phases P0 through P5 are implemented. `SINGULARITY-001` captured the baseline, `SINGULARITY-002` selected Content Collections, `SINGULARITY-003` replaced Contentlayer2, and `SINGULARITY-069` replaced Pliny with focused first-party components and maintained packages. The design foundations, application shell, portfolio surfaces, blog experience, and all five optional integrations followed. Phase P6 implementation is complete: unit, journey, accessibility, client-boundary, content-integrity, image, Lighthouse, security-policy, and continuous integration gates are in place. Phase P7 has not started.
 
 A remediation pass on 2026-09-19 reviewed P0 through P5 against this planning set and closed the gaps it found. The degraded static-export build had regressed, because `SINGULARITY-048` shipped `/og/[...slug]` as an edge route; that route is now prerendered and both build profiles pass. `SINGULARITY-026` had shipped the Canvas starfield in contradiction of the `SINGULARITY-005` verdict and is now the static layer the measurement called for. The post layout and the tags index, both of which had been left on starter markup, are on the design system. Per-task corrections are recorded in [tasks.md](tasks.md), and [architecture.md](architecture.md) now lists the client components that actually exist.
 
-Two external gates remain open and are owner-dependent rather than code-dependent: the deferred Vercel preview check inherited from P0, and social-preview and Rich Results validation against a real deployment.
+External gates remain owner- or platform-dependent: the deferred Vercel preview check inherited from P0, the first continuous integration pull-request run, deployed Content Security Policy verification, and social-preview and Rich Results validation against a real deployment.
 
 ## Document index
 

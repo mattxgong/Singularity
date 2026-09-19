@@ -11,6 +11,11 @@
 
 # testing
 /coverage
+/blob-report/
+/playwright-report/
+/test-results/
+/.lighthouseci/
+/data/blog/phase-6-authoring-fixture.mdx
 
 # next.js
 /.next/
@@ -20,7 +25,7 @@ public/sitemap.xml
 
 # production
 /build
-*.xml
+/public/**/*.xml
 
 # rss feed
 /public/feed.xml
@@ -54,5 +59,6 @@ tsconfig.tsbuildinfo
 /.venv/
 
 # PDFs
-.pdf
+*.pdf
+!/public/resume/*.pdf
 /ResumeLatex3.pdf

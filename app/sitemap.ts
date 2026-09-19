@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { allBlogs } from 'content-collections'
+import tagData from 'app/tag-data.json'
 import { projects, siteMetadata } from '@/data/index'
 
 export const dynamic = 'force-static'
@@ -20,10 +21,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: today,
   }))
 
+  const tagRoutes = Object.keys(tagData as Record<string, number>).map((tag) => ({
+    url: `${siteUrl}/tags/${encodeURI(tag)}`,
+    lastModified: today,
+  }))
+
   const routes = ['', 'about', 'projects', 'resume', 'blog', 'tags', 'uses'].map((route) => ({
     url: `${siteUrl}/${route}`,
     lastModified: today,
   }))
 
-  return [...routes, ...projectRoutes, ...blogRoutes]
+  return [...routes, ...projectRoutes, ...tagRoutes, ...blogRoutes]
 }
