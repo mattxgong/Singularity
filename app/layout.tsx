@@ -4,7 +4,7 @@ import 'remark-github-blockquote-alert/alert.css'
 
 import localFont from 'next/font/local'
 import Analytics from '@/components/Analytics'
-import siteMetadata from '@/data/siteMetadata'
+import { siteMetadata } from '@/data/index'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 

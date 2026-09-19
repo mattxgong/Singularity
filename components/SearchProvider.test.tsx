@@ -3,11 +3,11 @@ import { describe, expect, it, vi } from 'vitest'
 
 const push = vi.fn()
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }))
-vi.mock('@/data/siteMetadata', () => ({
-  default: { search: { provider: 'local', searchDocumentsPath: '/search.json' } },
+vi.mock('@/data/index', () => ({
+  siteMetadata: { search: { provider: 'local', searchDocumentsPath: '/search.json' } },
 }))
 
-import SearchButton from './SearchButton'
+import SearchButton from './layout/search-button'
 import SearchProvider from './SearchProvider'
 
 describe('SearchProvider', () => {

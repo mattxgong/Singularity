@@ -4,7 +4,7 @@ import { GetTypeByName } from "@content-collections/core";
 export type Blog = GetTypeByName<typeof configuration, "blogs">;
 export declare const allBlogs: Array<Blog>;
 
-export type Authors = GetTypeByName<typeof configuration, "authors">;
-export declare const allAuthors: Array<Authors>;
+export type ProjectCaseStudy = GetTypeByName<typeof configuration, "projectCaseStudies">;
+export declare const allProjectCaseStudies: Array<ProjectCaseStudy>;
 
 export {};

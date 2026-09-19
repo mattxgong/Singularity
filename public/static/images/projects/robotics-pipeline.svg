@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Robotics perception-to-action pipeline</title>
+  <desc id="description">Simulated camera input flows through YOLO perception and ROS planning to humanoid movement, with environmental feedback returning to the camera.</desc>
+  <rect width="1200" height="630" fill="#111827"/>
+  <g fill="none" stroke="#67e8f9" stroke-width="6">
+    <path d="M290 245h100"/>
+    <path d="M590 245h100"/>
+    <path d="M890 245h100"/>
+    <path d="M1090 330v145H140V330" stroke="#fbbf24"/>
+  </g>
+  <g fill="#67e8f9">
+    <path d="m390 245-22-14v28z"/>
+    <path d="m690 245-22-14v28z"/>
+    <path d="m990 245-22-14v28z"/>
+  </g>
+  <g fill="#1f2937" stroke="#9ca3af" stroke-width="3">
+    <rect x="90" y="155" width="200" height="175" rx="8"/>
+    <rect x="390" y="155" width="200" height="175" rx="8"/>
+    <rect x="690" y="155" width="200" height="175" rx="8"/>
+    <rect x="990" y="155" width="150" height="175" rx="8"/>
+  </g>
+  <g fill="#f9fafb" font-family="Arial, sans-serif" text-anchor="middle">
+    <text x="190" y="215" font-size="28" font-weight="700">Simulation</text>
+    <text x="190" y="258" font-size="21">Camera and scene</text>
+    <text x="490" y="215" font-size="28" font-weight="700">YOLO</text>
+    <text x="490" y="258" font-size="21">Detection and</text>
+    <text x="490" y="288" font-size="21">segmentation</text>
+    <text x="790" y="215" font-size="28" font-weight="700">ROS</text>
+    <text x="790" y="258" font-size="21">Planning and</text>
+    <text x="790" y="288" font-size="21">coordination</text>
+    <text x="1065" y="215" font-size="26" font-weight="700">Robot</text>
+    <text x="1065" y="258" font-size="19">Movement and</text>
+    <text x="1065" y="286" font-size="19">manipulation</text>
+    <text x="600" y="525" fill="#fbbf24" font-size="22">Environment feedback</text>
+  </g>
+</svg>

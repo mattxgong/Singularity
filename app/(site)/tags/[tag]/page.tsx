@@ -1,6 +1,6 @@
 import { slug } from 'github-slugger'
 import { allCoreContent, sortPosts } from '@/lib/content'
-import siteMetadata from '@/data/siteMetadata'
+import { siteMetadata } from '@/data/index'
 import ListLayout from '@/layouts/ListLayoutWithTags'
 import { allBlogs } from 'content-collections'
 import tagData from 'app/tag-data.json'

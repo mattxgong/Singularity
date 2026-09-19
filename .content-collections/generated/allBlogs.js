@@ -48,7 +48,7 @@ export default [
       "dateModified": "2016-03-08T00:00:00.000Z",
       "description": "Example of a markdown file with code blocks and syntax highlighting",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/code-sample"
+      "url": "https://mattxgong-singularity.vercel.app/blog/code-sample"
     }
   },
   {
@@ -104,7 +104,7 @@ export default [
       "dateModified": "2020-12-21T00:00:00.000Z",
       "description": "How to derive the OLS Estimator with matrix notation and a tour of math typesetting using markdown with the help of KaTeX.",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/deriving-ols-estimator"
+      "url": "https://mattxgong-singularity.vercel.app/blog/deriving-ols-estimator"
     }
   },
   {
@@ -244,7 +244,7 @@ export default [
       "dateModified": "2019-10-11T00:00:00.000Z",
       "description": "Markdown cheatsheet for all your blogging needs - headers, lists, images, tables and more! An illustrated guide based on GitHub Flavored Markdown.",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/github-markdown-guide"
+      "url": "https://mattxgong-singularity.vercel.app/blog/github-markdown-guide"
     }
   },
   {
@@ -307,7 +307,7 @@ export default [
       "dateModified": "2020-11-11T00:00:00.000Z",
       "description": "In this article we introduce adding images in the tailwind starter blog and the benefits and limitations of the next/image component.",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/guide-to-using-images-in-nextjs"
+      "url": "https://mattxgong-singularity.vercel.app/blog/guide-to-using-images-in-nextjs"
     }
   },
   {
@@ -427,7 +427,7 @@ export default [
       "dateModified": "2024-08-16T00:00:00.000Z",
       "description": "Looking for a performant, out of the box template, with all the best in web technology to support your blogging needs? Checkout the Tailwind Nextjs Starter Blog template.",
       "image": "/static/images/canada/mountains.jpg",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/introducing-tailwind-nextjs-starter-blog"
+      "url": "https://mattxgong-singularity.vercel.app/blog/introducing-tailwind-nextjs-starter-blog"
     }
   },
   {
@@ -466,7 +466,7 @@ export default [
       "dateModified": "2021-01-31T00:00:00.000Z",
       "description": "draft post",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/my-fancy-title"
+      "url": "https://mattxgong-singularity.vercel.app/blog/my-fancy-title"
     }
   },
   {
@@ -527,7 +527,7 @@ export default [
       "dateModified": "2021-05-02T00:00:00.000Z",
       "description": "The blog template supports posts in nested sub-folders. This can be used to group posts of similar content e.g. a multi-part course. This post is itself an example of a nested route!",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/nested-route\\introducing-multi-part-posts-with-nested-routing"
+      "url": "https://mattxgong-singularity.vercel.app/blog/nested-route\\introducing-multi-part-posts-with-nested-routing"
     }
   },
   {
@@ -661,7 +661,7 @@ export default [
       "dateModified": "2021-02-01T00:00:00.000Z",
       "description": "An overview of the new features released in v1 - code block copy, multiple authors, frontmatter layout and more",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/new-features-in-v1"
+      "url": "https://mattxgong-singularity.vercel.app/blog/new-features-in-v1"
     }
   },
   {
@@ -721,7 +721,7 @@ export default [
       "dateModified": "2017-07-15T00:00:00.000Z",
       "description": "The scenic lands of Canada featuring maple leaves, snow-capped mountains, turquoise lakes and Toronto. Take in the sights in this photo gallery exhibition and see how easy it is to replicate with some MDX magic and tailwind classes.",
       "image": "/static/images/canada/mountains.jpg",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/pictures-of-canada"
+      "url": "https://mattxgong-singularity.vercel.app/blog/pictures-of-canada"
     }
   },
   {
@@ -847,7 +847,7 @@ export default [
       "dateModified": "2023-08-05T00:00:00.000Z",
       "description": "Release of Tailwind Nextjs Starter Blog template v2.0, refactored with Nextjs App directory and React Server Components setup.Discover the new features and how to migrate from V1.",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/release-of-tailwind-nextjs-starter-blog-v2.0"
+      "url": "https://mattxgong-singularity.vercel.app/blog/release-of-tailwind-nextjs-starter-blog-v2.0"
     }
   },
   {
@@ -898,7 +898,7 @@ export default [
       "dateModified": "2018-08-15T00:00:00.000Z",
       "description": "The Time Traveller (for so it will be convenient to speak of him) was expounding a recondite matter to us. His pale grey eyes shone and twinkled, and his usually pale face was flushed and animated...",
       "image": "/static/images/twitter-card.png",
-      "url": "https://tailwind-nextjs-starter-blog.vercel.app/blog/the-time-machine"
+      "url": "https://mattxgong-singularity.vercel.app/blog/the-time-machine"
     }
   }
 ]

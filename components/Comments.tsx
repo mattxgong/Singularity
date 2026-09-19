@@ -3,7 +3,7 @@
 import Giscus from '@giscus/react'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
-import siteMetadata from '@/data/siteMetadata'
+import { siteMetadata } from '@/data/index'
 
 export default function Comments({ slug }: { slug: string }) {
   const [loadComments, setLoadComments] = useState(false)

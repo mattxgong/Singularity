@@ -2,7 +2,7 @@ export function StarfieldStatic() {
   return (
     <svg
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 hidden h-full w-full opacity-35 md:block dark:opacity-45"
+      className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-35 dark:opacity-45"
       viewBox="0 0 1440 900"
       preserveAspectRatio="xMidYMid slice"
     >

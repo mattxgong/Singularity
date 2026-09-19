@@ -5,9 +5,8 @@ import type { CoreContent } from '@/lib/content'
 import type { Blog } from 'content-collections'
 import Comments from '@/components/Comments'
 import Link from '@/components/Link'
-import PageTitle from '@/components/PageTitle'
-import SectionContainer from '@/components/SectionContainer'
-import siteMetadata from '@/data/siteMetadata'
+import { Container } from '@/components/ui/container'
+import { siteMetadata } from '@/data/index'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 
 interface LayoutProps {
@@ -23,7 +22,7 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
     images && images.length > 0 ? images[0] : 'https://picsum.photos/seed/picsum/800/400'
 
   return (
-    <SectionContainer>
+    <Container>
       <ScrollTopAndComment />
       <article>
         <div>
@@ -36,7 +35,7 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
               </Bleed>
             </div>
             <div className="relative pt-10">
-              <PageTitle>{title}</PageTitle>
+              <h1 className="text-display text-ink font-semibold">{title}</h1>
             </div>
           </div>
           <div className="prose dark:prose-invert max-w-none py-4">{children}</div>
@@ -73,6 +72,6 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
           </footer>
         </div>
       </article>
-    </SectionContainer>
+    </Container>
   )
 }

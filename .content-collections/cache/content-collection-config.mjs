@@ -1,128 +1,4 @@
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-
-// data/siteMetadata.js
-var require_siteMetadata = __commonJS({
-  "data/siteMetadata.js"(exports, module) {
-    "use strict";
-    var siteMetadata2 = {
-      title: "Singularity",
-      author: "Tails Azimuth",
-      headerTitle: "Singularity",
-      description: "Matthew Gong\u2019s personal portfolio and technical blog",
-      language: "en-us",
-      theme: "system",
-      // system, dark or light
-      siteUrl: "https://tailwind-nextjs-starter-blog.vercel.app",
-      siteRepo: "https://github.com/timlrx/tailwind-nextjs-starter-blog",
-      siteLogo: `${process.env.BASE_PATH || ""}/static/images/logo.png`,
-      socialBanner: `${process.env.BASE_PATH || ""}/static/images/twitter-card.png`,
-      mastodon: "https://mastodon.social/@mastodonuser",
-      email: "address@yoursite.com",
-      github: "https://github.com",
-      x: "https://twitter.com/x",
-      facebook: "https://facebook.com",
-      youtube: "https://youtube.com",
-      linkedin: "https://www.linkedin.com",
-      threads: "https://www.threads.net",
-      instagram: "https://www.instagram.com",
-      medium: "https://medium.com",
-      bluesky: "https://bsky.app/",
-      locale: "en-US",
-      // set to true if you want a navbar fixed to the top
-      stickyNav: false,
-      analytics: {
-        // If you want to use an analytics provider you have to add it to the
-        // content security policy in the `next.config.js` file.
-        // supports Plausible, Simple Analytics, Umami, Posthog or Google Analytics.
-        umamiAnalytics: {
-          // We use an env variable for this site to avoid other users cloning our analytics ID
-          umamiWebsiteId: process.env.NEXT_UMAMI_ID
-          // e.g. 123e4567-e89b-12d3-a456-426614174000
-          // You may also need to overwrite the script if you're storing data in the US - ex:
-          // src: 'https://us.umami.is/script.js'
-          // Remember to add 'us.umami.is' in `next.config.js` as a permitted domain for the CSP
-        }
-        // plausibleAnalytics: {
-        //   plausibleDataDomain: '', // e.g. tailwind-nextjs-starter-blog.vercel.app
-        // If you are hosting your own Plausible.
-        //   src: '', // e.g. https://plausible.my-domain.com/js/script.js
-        // },
-        // simpleAnalytics: {},
-        // posthogAnalytics: {
-        //   posthogProjectApiKey: '', // e.g. 123e4567-e89b-12d3-a456-426614174000
-        // },
-        // googleAnalytics: {
-        //   googleAnalyticsId: '', // e.g. G-XXXXXXX
-        // },
-      },
-      comments: {
-        // If you want to use an analytics provider you have to add it to the
-        // content security policy in the `next.config.js` file.
-        // Select a provider and use the environment variables associated to it
-        // https://vercel.com/docs/environment-variables
-        provider: "giscus",
-        // supported providers: giscus, utterances, disqus
-        giscusConfig: {
-          // Visit the link below, and follow the steps in the 'configuration' section
-          // https://giscus.app/
-          repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
-          repositoryId: process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID,
-          category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY,
-          categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,
-          mapping: "pathname",
-          // supported options: pathname, url, title
-          reactions: "1",
-          // Emoji reactions: 1 = enable / 0 = disable
-          // Send discussion metadata periodically to the parent window: 1 = enable / 0 = disable
-          metadata: "0",
-          // theme example: light, dark, dark_dimmed, dark_high_contrast
-          // transparent_dark, preferred_color_scheme, custom
-          theme: "light",
-          // theme when dark mode
-          darkTheme: "transparent_dark",
-          // If the theme option above is set to 'custom`
-          // please provide a link below to your custom theme css file.
-          // example: https://giscus.app/themes/custom_example.css
-          themeURL: "",
-          // This corresponds to the `data-lang="en"` in giscus's configurations
-          lang: "en"
-        }
-      },
-      search: {
-        provider: "local",
-        searchDocumentsPath: `${process.env.BASE_PATH || ""}/search.json`
-      }
-    };
-    module.exports = siteMetadata2;
-  }
-});
-
 // content-collections.ts
-var import_siteMetadata = __toESM(require_siteMetadata());
 import { defineCollection, defineConfig } from "@content-collections/core";
 import { compileMDX } from "@content-collections/mdx";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -144,26 +20,233 @@ import remarkMath from "remark-math";
 import { visit as visit2 } from "unist-util-visit";
 import { z } from "zod";
 
-// data/projectsData.ts
-var projectsData = [
+// data/profile.ts
+var profile = {
+  name: "Matthew Gong",
+  email: "matthewxgong@gmail.com",
+  location: "Waterloo, Ontario, Canada",
+  status: "Computing and Financial Management student and Technical Analyst",
+  positioning: "I build multi-agent systems and applied machine learning tools for complex technical workflows.",
+  biography: [
+    "I study Computing and Financial Management at the University of Waterloo, combining software engineering, machine learning, and financial analysis.",
+    "My work spans multi-agent developer workflows, applied data analysis, computer vision, and autonomous robotics."
+  ]
+};
+var profile_default = profile;
+
+// data/types.ts
+var ISO_MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+var SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+function assertIsoMonth(value, field) {
+  if (!ISO_MONTH_PATTERN.test(value)) {
+    throw new Error(`${field} must use the ISO YYYY-MM format`);
+  }
+}
+function validateProjects(projects2) {
+  const slugs = /* @__PURE__ */ new Set();
+  for (const project of projects2) {
+    if (!SLUG_PATTERN.test(project.slug)) {
+      throw new Error(`Project slug "${project.slug}" must be lowercase and hyphenated`);
+    }
+    if (slugs.has(project.slug)) {
+      throw new Error(`Duplicate project slug: ${project.slug}`);
+    }
+    slugs.add(project.slug);
+    assertIsoMonth(project.period.start, `${project.slug}.period.start`);
+    if (project.period.end) {
+      assertIsoMonth(project.period.end, `${project.slug}.period.end`);
+    }
+    if (project.cover && (!project.cover.alt.trim() || project.cover.width <= 0 || project.cover.height <= 0)) {
+      throw new Error(`Project cover for "${project.slug}" requires alt text and dimensions`);
+    }
+  }
+}
+function validateProjectCaseStudies(projects2, caseStudySlugs) {
+  const availableCaseStudies = new Set(caseStudySlugs);
+  const caseStudyReferences = projects2.flatMap(
+    (project) => project.caseStudy ? [project.caseStudy] : []
+  );
+  const referencedCaseStudies = new Set(caseStudyReferences);
+  if (availableCaseStudies.size !== caseStudySlugs.length) {
+    const duplicate = caseStudySlugs.find((slug2, index) => caseStudySlugs.indexOf(slug2) !== index);
+    throw new Error(`Duplicate case study document: ${duplicate}`);
+  }
+  if (referencedCaseStudies.size !== caseStudyReferences.length) {
+    const duplicate = caseStudyReferences.find(
+      (slug2, index) => caseStudyReferences.indexOf(slug2) !== index
+    );
+    throw new Error(`Case study referenced by multiple projects: ${duplicate}`);
+  }
+  for (const slug2 of referencedCaseStudies) {
+    if (!availableCaseStudies.has(slug2)) {
+      throw new Error(`Missing case study: ${slug2}`);
+    }
+  }
+  for (const slug2 of availableCaseStudies) {
+    if (!referencedCaseStudies.has(slug2)) {
+      throw new Error(`Orphan case study: ${slug2}`);
+    }
+  }
+}
+
+// data/projects.ts
+var projects = [
   {
-    title: "A Search Engine",
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: "/static/images/google.png",
-    href: "https://www.google.com"
+    slug: "solomon-chess-engine",
+    title: "Solomon: Chess Engine",
+    tagline: "A high-performance C++ chess engine with NNUE position evaluation.",
+    role: "Chess engine developer",
+    period: { start: "2025-01" },
+    status: "active",
+    stack: ["C++", "Bitboards", "Alpha-Beta Search", "NNUE"],
+    outcome: "Implemented incremental neural evaluation and optimized search while maintaining real-time play.",
+    featured: false,
+    order: 2,
+    links: []
   },
   {
-    title: "The Time Machine",
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: "/static/images/time-machine.jpg",
-    href: "/blog/the-time-machine"
+    slug: "robotics-challenge",
+    title: "Robotics Challenge",
+    tagline: "Computer vision and autonomous navigation for a humanoid robot.",
+    role: "Computer vision and autonomous navigation developer",
+    period: { start: "2025-07", end: "2025-08" },
+    status: "competition",
+    stack: ["Python", "ROS", "YOLO", "Computer Vision"],
+    outcome: "Won third place among hundreds of university teams across China.",
+    featured: true,
+    order: 1,
+    links: [],
+    caseStudy: "robotics-challenge"
+  },
+  {
+    slug: "ros-mobile-controller",
+    title: "ROS Mobile Controller",
+    tagline: "Remote iOS control and real-time SLAM mapping for a ROS robot.",
+    role: "iOS, controls, and mapping developer",
+    period: { start: "2023-09", end: "2024-04" },
+    status: "archived",
+    stack: ["C++", "ROS", "Swift", "iOS", "SLAM"],
+    outcome: "Delivered stable remote control and real-time spatial mapping on iOS.",
+    featured: false,
+    order: 3,
+    links: []
   }
 ];
-var projectsData_default = projectsData;
+validateProjects(projects);
+var projects_default = projects;
+
+// data/skills.ts
+var skillGroups = [
+  {
+    label: "Programming languages",
+    skills: [
+      "Python",
+      "C++",
+      "SQL",
+      "JavaScript",
+      "TypeScript",
+      "Java",
+      "Swift",
+      "CSS",
+      "HTML",
+      "C",
+      "R"
+    ].map((name) => ({ name, primary: ["Python", "C++", "TypeScript", "SQL"].includes(name) }))
+  },
+  {
+    label: "Libraries and frameworks",
+    skills: [
+      "PyTorch",
+      "Google Agent Development Kit",
+      "multi-agent systems",
+      "Hugging Face",
+      "TensorFlow",
+      "Node.js",
+      "Puppeteer",
+      "React",
+      "pandas"
+    ].map((name) => ({
+      name,
+      primary: ["PyTorch", "Google Agent Development Kit", "multi-agent systems", "React"].includes(
+        name
+      )
+    }))
+  },
+  {
+    label: "Tools and platforms",
+    skills: [
+      "Git",
+      "Linux",
+      "ROS",
+      "Google AI Studio",
+      "iOS",
+      "Power BI",
+      "Power Apps",
+      "Power Automate",
+      "AWS",
+      "Docker",
+      "SAP",
+      "Anaconda",
+      "Jupyter",
+      ".NET",
+      "Xcode",
+      "Unity"
+    ].map((name) => ({ name, primary: ["Git", "Linux", "ROS", "Docker"].includes(name) }))
+  }
+];
+
+// data/site.ts
+var basePath = process.env.BASE_PATH || "";
+var siteMetadata = {
+  title: "Singularity",
+  author: "Matthew Gong",
+  headerTitle: "Singularity",
+  description: "Matthew Gong's personal portfolio and technical blog",
+  language: "en-us",
+  locale: "en-US",
+  theme: "system",
+  siteUrl: "https://mattxgong-singularity.vercel.app",
+  siteRepo: "https://github.com/mattxgong/Singularity",
+  siteLogo: `${basePath}/static/images/logo.png`,
+  socialBanner: `${basePath}/static/images/twitter-card.png`,
+  email: profile_default.email,
+  github: "https://github.com/mattxgong/Singularity",
+  linkedin: "https://ca.linkedin.com/in/matthew-x-gong",
+  stickyNav: false,
+  analytics: {
+    umamiAnalytics: {
+      umamiWebsiteId: process.env.NEXT_UMAMI_ID
+    }
+  },
+  comments: {
+    provider: "giscus",
+    giscusConfig: {
+      repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
+      repositoryId: process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID,
+      category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY,
+      categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,
+      mapping: "pathname",
+      reactions: "1",
+      metadata: "0",
+      theme: "light",
+      darkTheme: "transparent_dark",
+      themeURL: "",
+      lang: "en"
+    }
+  },
+  search: {
+    provider: "local",
+    searchDocumentsPath: `${basePath}/search.json`
+  }
+};
+var site_default = siteMetadata;
+
+// data/social.ts
+var socialLinks = [
+  { kind: "mail", href: `mailto:${site_default.email}`, label: "Email Matthew Gong" },
+  { kind: "github", href: site_default.github, label: "Singularity on GitHub" },
+  { kind: "linkedin", href: site_default.linkedin, label: "Matthew Gong on LinkedIn" }
+];
 
 // lib/content/index.ts
 function coreContent(document) {
@@ -261,8 +344,8 @@ function writeArtifacts(allBlogs) {
   );
   writeFileSync("app/tag-data.json", `${JSON.stringify(sortedTagCount, null, 2)}
 `);
-  if (import_siteMetadata.default.search?.provider === "local") {
-    const searchDocumentsPath = import_siteMetadata.default.search.searchDocumentsPath;
+  if (site_default.search?.provider === "local") {
+    const searchDocumentsPath = site_default.search.searchDocumentsPath;
     if (typeof searchDocumentsPath !== "string") return;
     const searchPath = path.basename(searchDocumentsPath);
     const postDocuments = publishedBlogs.sort((first, second) => Date.parse(second.date) - Date.parse(first.date)).map((post) => ({
@@ -271,10 +354,11 @@ function writeArtifacts(allBlogs) {
       href: `/${post.path}`,
       kind: "post"
     }));
-    const projectDocuments = projectsData_default.map((project, index) => ({
-      ...project,
-      id: `project-${index}`,
-      href: project.href ?? "/projects",
+    const projectDocuments = projects_default.map((project) => ({
+      id: `project-${project.slug}`,
+      title: project.title,
+      summary: `${project.tagline} ${project.outcome}`,
+      href: project.links[0]?.href ?? "/projects",
       kind: "project"
     }));
     writeFileSync(`public/${searchPath}`, JSON.stringify([...postDocuments, ...projectDocuments]));
@@ -324,41 +408,45 @@ var blogs = defineCollection({
         datePublished: document.date,
         dateModified: document.lastmod ?? document.date,
         description: document.summary,
-        image: document.images?.[0] ?? import_siteMetadata.default.socialBanner,
-        url: `${import_siteMetadata.default.siteUrl}/blog/${slugPath}`
+        image: document.images?.[0] ?? site_default.socialBanner,
+        url: `${site_default.siteUrl}/blog/${slugPath}`
       }
     };
   },
   onSuccess: writeArtifacts
 });
-var authors = defineCollection({
-  name: "authors",
-  typeName: "Authors",
-  directory: "data/authors",
+var projectCaseStudies = defineCollection({
+  name: "projectCaseStudies",
+  typeName: "ProjectCaseStudy",
+  directory: "data/projects",
   include: "**/*.mdx",
   schema: z.object({
-    content: z.string(),
-    name: z.string(),
-    avatar: z.string().optional(),
-    occupation: z.string().optional(),
-    company: z.string().optional(),
-    email: z.string().optional(),
-    twitter: z.string().optional(),
-    bluesky: z.string().optional(),
-    linkedin: z.string().optional(),
-    github: z.string().optional(),
-    layout: z.string().optional()
+    content: z.string()
   }),
-  transform: async (document, context) => ({
-    ...document,
-    mdx: await compileMDX(context, document, mdxOptions),
-    slug: document._meta.path,
-    path: `authors/${document._meta.path}`,
-    filePath: path.posix.join("authors", document._meta.filePath.replaceAll("\\", "/")),
-    toc: await extractTocHeadings(document.content)
-  })
+  transform: async (document, context) => {
+    const slugPath = document._meta.path;
+    const reading = readingTime(document.content);
+    return {
+      ...document,
+      mdx: await compileMDX(context, document, mdxOptions),
+      readingTime: {
+        text: reading.text,
+        minutes: reading.minutes,
+        time: reading.time,
+        words: reading.words
+      },
+      slug: slugPath,
+      path: `projects/${slugPath}`,
+      filePath: path.posix.join("projects", document._meta.filePath.replaceAll("\\", "/")),
+      toc: await extractTocHeadings(document.content)
+    };
+  },
+  onSuccess: (documents) => validateProjectCaseStudies(
+    projects_default,
+    documents.map((document) => document.slug)
+  )
 });
-var content_collections_default = defineConfig({ content: [blogs, authors] });
+var content_collections_default = defineConfig({ content: [blogs, projectCaseStudies] });
 export {
   content_collections_default as default
 };

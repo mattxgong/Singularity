@@ -4,7 +4,7 @@ import { Command } from 'cmdk'
 import MiniSearch from 'minisearch'
 import { useRouter } from 'next/navigation'
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import siteMetadata from '@/data/siteMetadata'
+import { siteMetadata } from '@/data/index'
 
 interface SearchDocument {
   id: string

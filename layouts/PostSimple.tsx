@@ -4,9 +4,8 @@ import type { CoreContent } from '@/lib/content'
 import type { Blog } from 'content-collections'
 import Comments from '@/components/Comments'
 import Link from '@/components/Link'
-import PageTitle from '@/components/PageTitle'
-import SectionContainer from '@/components/SectionContainer'
-import siteMetadata from '@/data/siteMetadata'
+import { Container } from '@/components/ui/container'
+import { siteMetadata } from '@/data/index'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 
 interface LayoutProps {
@@ -20,7 +19,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
   const { path, slug, date, title } = content
 
   return (
-    <SectionContainer>
+    <Container>
       <ScrollTopAndComment />
       <article>
         <div>
@@ -35,7 +34,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
                 </div>
               </dl>
               <div>
-                <PageTitle>{title}</PageTitle>
+                <h1 className="text-display text-ink font-semibold">{title}</h1>
               </div>
             </div>
           </header>
@@ -77,6 +76,6 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
           </div>
         </div>
       </article>
-    </SectionContainer>
+    </Container>
   )
 }

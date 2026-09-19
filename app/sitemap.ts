@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { allBlogs } from 'content-collections'
-import siteMetadata from '@/data/siteMetadata'
+import { siteMetadata } from '@/data/index'
 
 export const dynamic = 'force-static'
 

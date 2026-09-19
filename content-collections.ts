@@ -19,8 +19,8 @@ import { remarkAlert } from 'remark-github-blockquote-alert'
 import remarkMath from 'remark-math'
 import { visit } from 'unist-util-visit'
 import { z } from 'zod'
-import siteMetadata from './data/siteMetadata'
-import projectsData from './data/projectsData'
+import { projects, siteMetadata } from './data'
+import { validateProjectCaseStudies } from './data/types'
 import { coreContent } from './lib/content'
 import { extractTocHeadings } from './lib/content/toc'
 
@@ -110,10 +110,11 @@ function writeArtifacts<T extends ArtifactBlog>(allBlogs: T[]) {
         href: `/${post.path}`,
         kind: 'post',
       }))
-    const projectDocuments = projectsData.map((project, index) => ({
-      ...project,
-      id: `project-${index}`,
-      href: project.href ?? '/projects',
+    const projectDocuments = projects.map((project) => ({
+      id: `project-${project.slug}`,
+      title: project.title,
+      summary: `${project.tagline} ${project.outcome}`,
+      href: project.links[0]?.href ?? '/projects',
       kind: 'project',
     }))
     writeFileSync(`public/${searchPath}`, JSON.stringify([...postDocuments, ...projectDocuments]))
@@ -174,32 +175,38 @@ const blogs = defineCollection({
   onSuccess: writeArtifacts,
 })
 
-const authors = defineCollection({
-  name: 'authors',
-  typeName: 'Authors',
-  directory: 'data/authors',
+const projectCaseStudies = defineCollection({
+  name: 'projectCaseStudies',
+  typeName: 'ProjectCaseStudy',
+  directory: 'data/projects',
   include: '**/*.mdx',
   schema: z.object({
     content: z.string(),
-    name: z.string(),
-    avatar: z.string().optional(),
-    occupation: z.string().optional(),
-    company: z.string().optional(),
-    email: z.string().optional(),
-    twitter: z.string().optional(),
-    bluesky: z.string().optional(),
-    linkedin: z.string().optional(),
-    github: z.string().optional(),
-    layout: z.string().optional(),
   }),
-  transform: async (document, context) => ({
-    ...document,
-    mdx: await compileMDX(context, document, mdxOptions),
-    slug: document._meta.path,
-    path: `authors/${document._meta.path}`,
-    filePath: path.posix.join('authors', document._meta.filePath.replaceAll('\\', '/')),
-    toc: await extractTocHeadings(document.content),
-  }),
+  transform: async (document, context) => {
+    const slugPath = document._meta.path
+    const reading = readingTime(document.content)
+
+    return {
+      ...document,
+      mdx: await compileMDX(context, document, mdxOptions),
+      readingTime: {
+        text: reading.text,
+        minutes: reading.minutes,
+        time: reading.time,
+        words: reading.words,
+      },
+      slug: slugPath,
+      path: `projects/${slugPath}`,
+      filePath: path.posix.join('projects', document._meta.filePath.replaceAll('\\', '/')),
+      toc: await extractTocHeadings(document.content),
+    }
+  },
+  onSuccess: (documents) =>
+    validateProjectCaseStudies(
+      projects,
+      documents.map((document) => document.slug)
+    ),
 })
 
-export default defineConfig({ content: [blogs, authors] })
+export default defineConfig({ content: [blogs, projectCaseStudies] })

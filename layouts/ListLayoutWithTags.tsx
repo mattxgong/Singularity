@@ -7,7 +7,7 @@ import type { CoreContent } from '@/lib/content'
 import type { Blog } from 'content-collections'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
-import siteMetadata from '@/data/siteMetadata'
+import { siteMetadata } from '@/data/index'
 import tagData from 'app/tag-data.json'
 
 interface PaginationProps {

@@ -168,11 +168,11 @@ Three questions remain unresolved. None blocks starting work, but each blocks a 
 
 ### OQ-1 How much MPBSDP detail is publishable
 
-Blocks `SINGULARITY-030` fully and `SINGULARITY-045` partially. Needed before Phase P3 exits.
+Resolved by Matthew Gong on 2026-09-18. Publish generic techniques and architecture patterns, but do not name internal systems, specific client work, or proprietary tooling.
 
 The Technical Analyst role describes multi-agent system architecture, an Angular 4 to Angular 20 migration, automation against Azure DevOps and Figma, and Karpathy-style LLM wikis with hybrid retrieval. This is the most current and most differentiated material available, and [product-and-design.md](product-and-design.md) recommends it anchor both the home page positioning and the seed blog post. Employer confidentiality may constrain what can be said.
 
-`Recommendation` as a default: describe techniques and architecture patterns generically, without naming internal systems, specific client work, or proprietary tooling. A post about orchestrating multi-agent workflows can be written entirely from general principles and still demonstrate the expertise. If even that is constrained, fall back to the Robotics Challenge as the anchor and treat the role as a resume line only.
+Implementation constraint: describe techniques and architecture patterns generically. A post about orchestrating multi-agent workflows may use general principles, but must not expose confidential implementation details.
 
 ### OQ-2 What is the production domain
 

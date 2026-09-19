@@ -1,5 +1,5 @@
 import Script from 'next/script'
-import siteMetadata from '@/data/siteMetadata'
+import { siteMetadata } from '@/data/index'
 
 export default function Analytics() {
   const config = siteMetadata.analytics?.umamiAnalytics

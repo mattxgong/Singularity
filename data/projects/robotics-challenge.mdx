@@ -1,0 +1,35 @@
+## The problem
+
+The embodied artificial intelligence challenge asked university teams to make a humanoid robot perceive a simulated environment and complete autonomous tasks. The robot needed to combine real-time vision with navigation, stair climbing, turning, walking, and object manipulation.
+
+## My role
+
+I focused on the computer-vision and autonomous-navigation portions of the team entry. My work covered retraining the YOLO model for segmentation and object detection, then connecting its output to the ROS control pipeline used by the simulated humanoid.
+
+## The approach
+
+We treated perception and movement as one pipeline rather than independent demonstrations. Visual detections supplied the scene information needed by the navigation logic, while ROS coordinated movement primitives for approaching stairs, picking up objects, turning, and walking.
+
+<figure>
+  <Image
+    src="/static/images/projects/robotics-pipeline.svg"
+    alt="Pipeline diagram showing simulated camera input flowing through YOLO perception and ROS planning to humanoid movement, with a feedback path from the environment"
+    width={1200}
+    height={630}
+  />
+  <figcaption>The perception-to-action pipeline used to organize the challenge system.</figcaption>
+</figure>
+
+## Technical detail
+
+The vision stage used a retrained YOLO network for real-time segmentation and object detection. Its output fed ROS-based navigation logic instead of stopping at visual annotations. This made perception useful to the behavior layer, where the robot had to sequence locomotion and manipulation actions in response to the simulated scene.
+
+The difficult boundary was coordination: a useful detection needed to arrive in a form and at a cadence that the navigation system could act on. Keeping those interfaces explicit made it possible to iterate on vision and movement without treating the complete robot behavior as one opaque block.
+
+## The outcome
+
+The team placed third among hundreds of university teams across China. The result demonstrated an end-to-end system that connected retrained computer vision with autonomous humanoid behavior in simulation.
+
+## What I would do differently
+
+I would define separate latency and task-success budgets for perception, planning, and control before integration. I would also automate scenario replay so model or navigation changes could be compared against the same stairs, objects, and movement sequences instead of relying primarily on full manual runs.

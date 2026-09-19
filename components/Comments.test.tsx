@@ -13,8 +13,8 @@ vi.mock('@giscus/react', async () => {
   }
 })
 vi.mock('next-themes', () => ({ useTheme: () => ({ resolvedTheme: 'dark' }) }))
-vi.mock('@/data/siteMetadata', () => ({
-  default: {
+vi.mock('@/data/index', () => ({
+  siteMetadata: {
     comments: {
       provider: 'giscus',
       giscusConfig: {

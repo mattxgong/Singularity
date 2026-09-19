@@ -1,10 +1,19 @@
 import { writeFileSync, mkdirSync } from 'fs'
 import path from 'path'
 import { slug } from 'github-slugger'
-import siteMetadata from '../data/siteMetadata.js'
 import tagData from '../app/tag-data.json' with { type: 'json' }
 import { allBlogs } from '../.content-collections/generated/index.js'
 import { generateRss } from './rss-utils.mjs'
+
+// Keep these values aligned with data/site.ts; this standalone script cannot import TypeScript.
+const siteMetadata = {
+  title: 'Singularity',
+  author: 'Matthew Gong',
+  description: "Matthew Gong's personal portfolio and technical blog",
+  language: 'en-us',
+  siteUrl: 'https://mattxgong-singularity.vercel.app',
+  email: 'matthewxgong@gmail.com',
+}
 
 const sortPosts = (posts) =>
   [...posts].sort((first, second) => Date.parse(second.date) - Date.parse(first.date))

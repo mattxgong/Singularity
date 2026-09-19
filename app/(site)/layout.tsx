@@ -1,17 +1,17 @@
-import Footer from '@/components/Footer'
-import Header from '@/components/Header'
-import { StarfieldStatic } from '@/components/decorative/starfield-static'
+import Footer from '@/components/layout/footer'
+import Header from '@/components/layout/header'
+import { StarfieldMount } from '@/components/decorative/star-field-mount'
 import { SkipLink } from '@/components/layout/skip-link'
 import SearchProvider from '@/components/SearchProvider'
-import SectionContainer from '@/components/SectionContainer'
+import { Container } from '@/components/ui/container'
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SkipLink />
-      <StarfieldStatic />
+      <StarfieldMount />
       <div className="relative z-10">
-        <SectionContainer>
+        <Container>
           <SearchProvider>
             <Header />
             <main id="main-content" tabIndex={-1} className="mb-auto">
@@ -19,7 +19,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
             </main>
           </SearchProvider>
           <Footer />
-        </SectionContainer>
+        </Container>
       </div>
     </>
   )
