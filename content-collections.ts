@@ -60,26 +60,28 @@ type ArtifactBlog = {
   tags: string[]
 }
 
-const mdxOptions = {
-  cwd: root,
-  remarkPlugins: [remarkGfm, remarkMath, remarkLocalImages, remarkAlert],
-  rehypePlugins: [
-    rehypeSlug,
-    [
-      rehypeAutolinkHeadings,
-      {
-        behavior: 'prepend',
-        headingProperties: { className: ['content-header'] },
-        content: headingLinkIcon,
-      },
+function createMdxOptions(bibliography?: string): MdxOptions {
+  return {
+    cwd: root,
+    remarkPlugins: [remarkGfm, remarkMath, remarkLocalImages, remarkAlert],
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: 'prepend',
+          headingProperties: { className: ['content-header'] },
+          content: headingLinkIcon,
+        },
+      ],
+      rehypeKatex,
+      rehypeKatexNoTranslate,
+      [rehypeCitation, { path: path.join(root, 'data'), bibliography }],
+      [rehypePrettyCode, { defaultLang: 'js', keepBackground: false }],
+      rehypePresetMinify,
     ],
-    rehypeKatex,
-    rehypeKatexNoTranslate,
-    [rehypeCitation, { path: path.join(root, 'data') }],
-    [rehypePrettyCode, { defaultLang: 'js', keepBackground: false }],
-    rehypePresetMinify,
-  ],
-} satisfies MdxOptions
+  }
+}
 
 function writeArtifacts<T extends ArtifactBlog>(allBlogs: T[]) {
   const publishedBlogs = allBlogs.filter((post) => !isProduction || post.draft !== true)
@@ -139,12 +141,14 @@ const blogs = defineCollection({
     images: z.union([z.string(), z.array(z.string())]).optional(),
     authors: z.array(z.string()).optional(),
     layout: z.string().optional(),
+    series: z.string().optional(),
+    featured: z.boolean().optional(),
     bibliography: z.string().optional(),
     canonicalUrl: z.string().optional(),
   }),
   transform: async (document, context) => {
     const slugPath = document._meta.path
-    const mdx = await compileMDX(context, document, mdxOptions)
+    const mdx = await compileMDX(context, document, createMdxOptions(document.bibliography))
     const reading = readingTime(document.content)
 
     return {
@@ -189,7 +193,7 @@ const projectCaseStudies = defineCollection({
 
     return {
       ...document,
-      mdx: await compileMDX(context, document, mdxOptions),
+      mdx: await compileMDX(context, document, createMdxOptions()),
       readingTime: {
         text: reading.text,
         minutes: reading.minutes,

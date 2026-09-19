@@ -4,14 +4,24 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
+const defaultUmamiOrigin = 'https://analytics.umami.is'
+const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL || `${defaultUmamiOrigin}/script.js`
+let umamiOrigin = defaultUmamiOrigin
+
+try {
+  umamiOrigin = new URL(umamiScriptUrl).origin
+} catch {
+  // The application remains analytics-free when the deployment URL is invalid.
+}
+
 // You might need to insert additional domains in script-src if you are using external services
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app analytics.umami.is;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app ${umamiOrigin};
   style-src 'self' 'unsafe-inline';
   img-src * blob: data:;
   media-src *.s3.amazonaws.com;
-  connect-src *;
+  connect-src 'self' ${umamiOrigin};
   font-src 'self';
   frame-src giscus.app
 `
@@ -79,12 +89,6 @@ module.exports = () => {
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     images: {
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'picsum.photos',
-        },
-      ],
       unoptimized,
     },
     async headers() {

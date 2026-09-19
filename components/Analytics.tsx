@@ -11,6 +11,7 @@ export default function Analytics() {
       defer
       src={config.src ?? 'https://analytics.umami.is/script.js'}
       data-website-id={config.umamiWebsiteId}
+      data-auto-track="true"
       strategy="afterInteractive"
     />
   )

@@ -46,6 +46,13 @@ yarn-error.log*
 # Contentlayer
 .contentlayer
 
+# generated content artifacts
+/.content-collections/
+tsconfig.tsbuildinfo
+
+# python tooling
+/.venv/
+
 # PDFs
 .pdf
 /ResumeLatex3.pdf

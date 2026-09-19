@@ -2,7 +2,7 @@
 title: Singularity Task Backlog
 description: Implementation-ready, dependency-ordered task backlog with objectives, scope, acceptance criteria, validation, and risk for the Singularity transformation
 author: Matthew Gong
-ms.date: 2026-09-17
+ms.date: 2026-09-19
 ms.topic: reference
 keywords:
   - tasks
@@ -425,6 +425,10 @@ yarn build
 yarn serve
 ```
 
+Correction, 2026-09-19. Two suppressions survived the migration and have now been removed. `components/SearchProvider.tsx` cast MiniSearch results with `as unknown as SearchDocument[]`; the dialog now resolves match identifiers against a typed document map, so no cast is needed. [app/seo.tsx](../../../app/seo.tsx) carried `[key: string]: any` behind an `eslint-disable` for `no-explicit-any`; its props now extend `Metadata`, which is both narrower and more useful to callers.
+
+`"composite": true` was also removed from `tsconfig.json`. There are no project references in this repository, and the flag made every build emit `TypeScript project references are not fully supported` while writing a stray `tsconfig.tsbuildinfo` into version control.
+
 Risks and rollback. If a third-party type gap proves unfixable without suppression, document the single exception with a comment naming the package and the reason. Rollback: revert `tsconfig.json` and the fixes together.
 
 ### SINGULARITY-008 Add the missing quality scripts
@@ -496,6 +500,10 @@ yarn dev
 ```
 
 Then walk every existing route in both themes.
+
+Correction, 2026-09-19. The default border colour in [css/tailwind.css](../../../css/tailwind.css) still resolved to `--color-gray-200` in both themes, so any border that did not name a token rendered near-white against the dark surface. It now resolves to `--color-boundary`. The `--color-focus` token was defined for both themes but never referenced, because the focus-visible rules still used `--color-primary-500`; they now use `--color-focus`. The `.footnotes` rule hardcoded `border-gray-200 dark:border-gray-700` and now uses the boundary token.
+
+[app/layout.tsx](../../../app/layout.tsx) also carried `bg-white text-black dark:bg-gray-950 dark:text-white` on `<body>`. Tailwind v4 orders the utilities layer after the base layer, so those utilities beat the `body { background-color: var(--color-surface) }` base rule and the plate and void surfaces never rendered. The utilities are removed and the base rule now owns the document surface.
 
 Risks and rollback. Colour choices are subjective and will be revisited after `SINGULARITY-012` measures contrast. Expect one revision. Rollback: revert the single file.
 
@@ -693,6 +701,8 @@ yarn typecheck
 yarn lint
 ```
 
+Correction, 2026-09-19. `lib/cn.ts` called `twMerge` with stock configuration. `tailwind-merge` can only deduplicate utilities it can classify, and it has no knowledge of the scales `SINGULARITY-009` and `SINGULARITY-013` introduced, so `text-heading-3`, `text-small`, `py-rhythm-7`, `duration-fast`, `ease-standard`, and every semantic colour were unclassified. Conflicting overrides passed through `className` could both survive, and font-size and colour utilities risked landing in one group. The helper now uses `extendTailwindMerge` with the project's colour, text, spacing, easing, and duration scales declared, and `tests/unit/ui-primitives.test.tsx` asserts the resolution for each group so a future token addition that is not registered fails a test rather than silently mis-merging.
+
 Risks and rollback. Over-abstraction is the risk. If a variant is used once, inline it instead. Rollback: delete the files.
 
 ### SINGULARITY-016 Prose primitive and Prism retune
@@ -828,6 +838,10 @@ Validation.
 yarn typecheck
 yarn build
 ```
+
+Correction, 2026-09-19. Three files with zero importers survived the sweep and have now been deleted. [components/Card.tsx](../../../components/Card.tsx) was the four-prop card that `SINGULARITY-015` cites as the design it replaces. `lib/site-config.ts` was the temporary `SiteConfig` interface introduced by `SINGULARITY-069` and superseded by `data/site.ts` in `SINGULARITY-020`. `public/static/images/sparrowhawk-avatar.jpg` and `public/static/images/avatar.png` were starter author portraits with no consumer.
+
+The same pass removed the starter gray ramp from [css/tailwind.css](../../../css/tailwind.css). `SINGULARITY-009` deliberately retained it until every consumer migrated; that condition is now met, and a repository scan returns no `gray-*` utility in first-party source.
 
 Risks and rollback. A component referenced only from MDX would not be caught by a TypeScript check. Search content files explicitly. Rollback: restore from Git.
 
@@ -1006,6 +1020,10 @@ yarn dev
 
 Then test on a real iOS device or an accurate simulator.
 
+Correction, 2026-09-19. The sheet is now split into a plain trigger button and `components/layout/mobile-nav-panel.tsx`, which is imported through `React.lazy`. Headless UI and `body-scroll-lock` previously loaded on every route for a control that only exists below the medium breakpoint; measured against the built output, that chunk was about 40 KB gzipped. The panel is prefetched on pointer enter and on focus, so the sheet still opens without a perceptible delay.
+
+Because the dialog no longer exists in the tree before first open, Headless UI can no longer capture the previously focused element. Focus restoration is therefore performed explicitly against a trigger ref, which is the behaviour this task's acceptance criteria require and is covered by the existing Escape test.
+
 Risks and rollback. iOS Safari scroll locking is genuinely difficult and the reason the dependency exists. Do not remove it without device testing. Rollback: revert the file.
 
 ### SINGULARITY-025 Rebuild the footer with colophon and attribution
@@ -1045,29 +1063,28 @@ Risks and rollback. Low. Rollback: revert the file.
 
 ### SINGULARITY-026 Starfield implementation and mount
 
-| Field      | Value                                             |
-| ---------- | ------------------------------------------------- |
-| Phase      | P2                                                |
-| Size       | M                                                 |
-| Depends on | SINGULARITY-005, SINGULARITY-017, SINGULARITY-018 |
-| Unlocks    | none                                              |
+| Field      | Value                                                      |
+| ---------- | ---------------------------------------------------------- |
+| Phase      | P2                                                         |
+| Size       | M                                                          |
+| Depends on | SINGULARITY-005, SINGULARITY-017, SINGULARITY-018          |
+| Unlocks    | none                                                       |
+| Status     | Complete. Canvas withdrawn per the SINGULARITY-005 verdict |
 
-Objective. Ship the decorative starfield within its hard budgets, with a static fallback that is the default on mobile and under reduced motion.
+Objective. Ship the decorative starfield within its hard budgets. `SINGULARITY-005` recorded a negative verdict for the Canvas prototype, so the rollback path in this task is the delivered path: the static SVG on every viewport.
 
-Scope. Three components: the canvas implementation, the static SVG, and the mount that chooses between them. Non-goals: any other animation.
+Scope. One component, the static SVG, rendered by the shell layout. Non-goals: the canvas implementation, the reduced-motion mount that chose between them, and any other animation.
 
-Files. `components/decorative/starfield.tsx`, `components/decorative/starfield-static.tsx`, `components/decorative/star-field-mount.tsx`, `app/(site)/layout.tsx`.
+Files. `components/decorative/starfield-static.tsx`, `app/(site)/layout.tsx`.
 
-Implementation notes. Every constraint in [product-and-design.md](product-and-design.md) is a hard requirement, not a guideline. The canvas module must be loaded through `next/dynamic` with `ssr: false` so it is never on the Largest Contentful Paint path, and it must not be in the executed path at all when reduced motion is set, which means checking the media query before the dynamic import rather than inside the component. Mount as a sibling of `{children}`, never as a wrapper, or the entire page subtree becomes client-rendered. Suspend on `IntersectionObserver` and on `visibilitychange`. Cap device pixel ratio at 2 and star count at 240. Handle a null return from `getContext('2d')` by leaving the static fallback in place.
+Implementation notes. Render as a sibling of `{children}`, never as a wrapper, or the entire page subtree becomes client-rendered. The SVG uses the semantic colour tokens, so it follows both themes without JavaScript and needs no reduced-motion branch.
 
 Acceptance criteria.
 
-- `aria-hidden="true"` and `pointer-events: none` on the canvas, and a `z-index` below all interactive content.
-- Under reduced motion, the canvas module does not appear in the network waterfall at all.
-- Below the medium breakpoint, the static SVG renders and the canvas module is not loaded.
-- Animation stops when the tab is hidden and when the canvas is scrolled out of view.
-- Main-thread time per frame stays under 2 milliseconds at 4 times CPU throttling.
-- The canvas module is at or under 8 KB gzipped.
+- `aria-hidden="true"` and `pointer-events: none` on the artwork, and a `z-index` below all interactive content.
+- The artwork renders on every viewport and in both themes.
+- No canvas or animation-frame module is shipped.
+- The decorative layer contributes zero kilobytes of client JavaScript.
 - No page component became a client component as a result.
 - Home page Lighthouse performance does not regress from the `SINGULARITY-001` baseline.
 
@@ -1079,9 +1096,13 @@ yarn analyze
 yarn serve
 ```
 
-Then profile with the operating system reduced-motion setting both off and on.
+Implementation evidence, 2026-09-19.
 
-Risks and rollback. If any budget is missed, ship only the static SVG and withdraw the canvas. The design does not depend on it. Rollback: delete the canvas module and the mount's branch.
+- `SINGULARITY-005` measured the single-canvas prototype at 1.823 milliseconds mean and 2.8 milliseconds p95 under 6 times throttling, with one 81 millisecond long task, and 5.289 milliseconds mean with forty long tasks over five minutes. Both the 2 millisecond frame budget and the 50 millisecond long-task threshold failed.
+- An earlier implementation shipped the canvas above the medium breakpoint regardless. That contradicted the recorded verdict and has been withdrawn.
+- `components/decorative/starfield.tsx` and `components/decorative/star-field-mount.tsx` are deleted. The shell renders `StarfieldStatic` directly, which removed two client components from every route.
+
+Risks and rollback. Reintroducing motion requires an amended `SINGULARITY-005` with measurements that clear both thresholds. Rollback: none needed; the static layer is the design's intended floor.
 
 ### SINGULARITY-027 Rebuild the not-found page
 
@@ -1653,6 +1674,7 @@ Risks and rollback. Low. If it feels like filler, withdraw the task and move the
 | Size       | L               |
 | Depends on | SINGULARITY-016 |
 | Unlocks    | all of P4       |
+| Status     | Complete        |
 
 Objective. Replace three near-duplicate layouts with one variant-driven layout, per decision A4. This is the P4 gate.
 
@@ -1685,6 +1707,21 @@ yarn serve
 
 Then open one post of each variant in both themes.
 
+Implementation evidence, 2026-09-18.
+
+- `layouts/post-layout.tsx` now maps the legacy values to typed `default`, `minimal`, and `banner` variants through the blog route.
+- The shared layout owns the post header, prose body, edit and discussion links, comments, tags, previous and next navigation, and blog return link without an author region.
+- The banner is the only structural variant branch. It uses the first-party full-bleed component and reserves a 1600 by 800 image area before loading.
+- The three legacy layout files were deleted, and a repository scan found no stale importers.
+- Browser checks covered one existing post for each variant in light and dark themes. All six cases rendered the expected heading and navigation without horizontal overflow; only the banner fixture rendered a header image.
+- `yarn lint`, `yarn typecheck`, `yarn test`, and `yarn build` passed. The production build generated all 64 static pages, including all 11 blog post routes.
+
+Correction, 2026-09-19. The consolidation was structurally complete but never restyled. The layout still carried the starter gray ramp, `text-base`, `text-sm`, and `text-xs` in place of the fluid scale, and `text-primary-500` link colours, and it applied `prose dark:prose-invert max-w-none` inline instead of consuming the `Prose` primitive, which broke the single-owner rule in `SINGULARITY-016` and discarded the prose measure. All of that now uses the observatory tokens and the `Prose` primitive.
+
+Two further leftovers were removed in the same pass. The banner variant fell back to `https://picsum.photos/seed/picsum/1600/800` when a post declared no image, which is why [next.config.js](../../../next.config.js) still allowlisted `picsum.photos` in `images.remotePatterns`; the banner now renders only when the post supplies an image, and the allowlist entry is gone. The "Discuss on Twitter" link pointed at `mobile.twitter.com`, a domain that no longer resolves, and has been dropped in favour of the GitHub source link.
+
+An inner `Container` was also removed, because the shell layout already wraps every route in one and the nesting doubled the horizontal padding on post routes.
+
 Risks and rollback. Do this before deleting the starter posts in `SINGULARITY-045`, so there is real content of all three variants to verify against. Rollback: revert the branch.
 
 ### SINGULARITY-042 Extend blog frontmatter with series and featured
@@ -1695,6 +1732,7 @@ Risks and rollback. Do this before deleting the starter posts in `SINGULARITY-04
 | Size       | S                                |
 | Depends on | SINGULARITY-041                  |
 | Unlocks    | SINGULARITY-043, SINGULARITY-047 |
+| Status     | Complete                         |
 
 Objective. Add the two fields the home page and series navigation need.
 
@@ -1718,6 +1756,12 @@ yarn build
 yarn typecheck
 ```
 
+Implementation evidence, 2026-09-18.
+
+- The Blog schema defines optional `series` strings and optional `featured` booleans.
+- Content generation and TypeScript validation pass with all existing posts omitting both fields.
+- The production build generated both collections and all 12 current documents without schema errors.
+
 Risks and rollback. Low. Rollback: revert the file.
 
 ### SINGULARITY-043 Table of contents sidebar
@@ -1728,6 +1772,7 @@ Risks and rollback. Low. Rollback: revert the file.
 | Size       | M               |
 | Depends on | SINGULARITY-041 |
 | Unlocks    | none            |
+| Status     | Complete        |
 
 Objective. Add a sticky table of contents above the large breakpoint and a disclosure below it, using the typed `toc` field from `SINGULARITY-003`.
 
@@ -1756,6 +1801,13 @@ yarn dev
 yarn analyze
 ```
 
+Implementation evidence, 2026-09-18.
+
+- The server component omits tables of contents with fewer than three level-two through level-four headings.
+- Mobile rendering uses a native disclosure. Desktop rendering uses a sticky, truncated navigation list above the large breakpoint.
+- A focused client component observes headings with `IntersectionObserver`, marks the active link, and transfers keyboard focus to linked headings.
+- Component tests cover the omission threshold and focus behavior. Production browser checks confirmed one visible table of contents at each breakpoint, sticky desktop positioning, native mobile disclosure, dark-theme rendering, and no horizontal overflow.
+
 Risks and rollback. Scroll spy is a common source of jank. If `IntersectionObserver` proves fiddly, ship the static list without active-state tracking, which removes the client dependency entirely. Rollback: remove the component from the layout.
 
 ### SINGULARITY-044 Restyle the blog list and add a results live region
@@ -1766,6 +1818,7 @@ Risks and rollback. Scroll spy is a common source of jank. If `IntersectionObser
 | Size       | M                                |
 | Depends on | SINGULARITY-015, SINGULARITY-041 |
 | Unlocks    | none                             |
+| Status     | Complete                         |
 
 Objective. Restyle the blog list to the new design system and fix its accessibility gap.
 
@@ -1796,6 +1849,16 @@ yarn dev
 
 Then test the filter with a screen reader.
 
+Implementation evidence, 2026-09-18.
+
+- The lowercase list layout is a Server Component that owns static tag navigation and crawlable pagination links.
+- The filter island searches titles, summaries, and tags, announces singular and plural result counts through a polite live region, and renders a clear empty state.
+- Post cards expose one article link target. Their tag labels remain descriptive text rather than competing links.
+- Browser checks at 375, 768, and 1440 pixels confirmed responsive topic navigation and no horizontal overflow. A known query returned and announced one result, and the empty query state retained a real `/blog/page/2/` pagination anchor.
+- The production blog route decreased from 113 KB to 109 KB first-load JavaScript after the client boundary was narrowed.
+
+Correction, 2026-09-19. The topic sidebar was `hidden md:block`, so there was no way to browse tags from the blog list on a phone. That is the device the recruiter journey assumes. The same list now renders inside a disclosure below the medium breakpoint and as the sticky sidebar above it, matching the pattern the table of contents already uses. The filter input also had `outline-none` with only a border change on focus, which is not a sufficient focus indicator; it now carries a visible focus-visible outline.
+
 Risks and rollback. Passing Server Components as children into a client component is correct but easy to get wrong. Verify with the bundle analyzer that the sidebar did not get pulled into the client bundle. Rollback: revert the branch.
 
 ### SINGULARITY-045 Replace starter content with a template and a seed post
@@ -1806,6 +1869,7 @@ Risks and rollback. Passing Server Components as children into a client componen
 | Size       | M                                                 |
 | Depends on | SINGULARITY-041, SINGULARITY-042, SINGULARITY-046 |
 | Unlocks    | SINGULARITY-051, SINGULARITY-061                  |
+| Status     | Complete                                          |
 
 Objective. Delete the eleven starter posts and publish one real post, per D8.
 
@@ -1842,6 +1906,14 @@ yarn serve
 
 Then inspect `public/feed.xml`, `public/search.json`, and `app/tag-data.json`.
 
+Implementation evidence, 2026-09-18.
+
+- All eleven starter posts and their demo images were removed. The replacement template is draft-only and documents every supported frontmatter field.
+- One confidentiality-safe seed post exercises code, mathematics, citations, figures, callouts, and the responsive table of contents. Its bibliography is resolved through the document's validated frontmatter rather than implicit file metadata.
+- Generated tag, search, and feed artifacts contain the seed post and its real tags without template or starter-content residue. RSS contains one blog item.
+- The production build generated one blog route and all three existing project case studies. Browser checks in both themes confirmed transformed citation and bibliography output, two code blocks, four KaTeX nodes, figures, a callout, and no horizontal overflow.
+- The desktop and mobile reader journey passed with a sticky table of contents, an `On this page` disclosure, and cumulative layout shift of zero in both themes.
+
 Risks and rollback. Deleting the posts removes the fixtures that layout work depended on, which is why this runs after `SINGULARITY-041`. Rollback: restore from Git.
 
 ### SINGULARITY-046 MDX component set
@@ -1852,6 +1924,7 @@ Risks and rollback. Deleting the posts removes the fixtures that layout work dep
 | Size       | M                                |
 | Depends on | SINGULARITY-016, SINGULARITY-041 |
 | Unlocks    | SINGULARITY-045                  |
+| Status     | Complete                         |
 
 Objective. Give authored content the components it needs: figures with captions, callouts, and tabbed code groups.
 
@@ -1882,6 +1955,14 @@ yarn dev
 
 Then exercise each component in a scratch MDX file.
 
+Implementation evidence, 2026-09-18.
+
+- The MDX component map moved under `components/mdx/` and is shared by blog posts and project case studies.
+- `Figure` emits semantic figure and caption elements, requires explicit dimensions, and uses CSS-only light and dark image switching.
+- `Callout` emits the same `markdown-alert` and variant classes as the existing GitHub alert transform.
+- `CodeGroup` is the only new client component. It implements tab, tablist, and tabpanel semantics with roving focus and Arrow Left, Arrow Right, Home, and End controls.
+- Focused tests cover semantic output, dimensions, alert classes, tab selection, and keyboard focus. All 34 repository tests and the production build pass.
+
 Risks and rollback. Dual-theme images can flash on load if switched with JavaScript. Use the CSS-only picture technique. Rollback: revert the files.
 
 ### SINGULARITY-047 Post navigation and related posts
@@ -1892,6 +1973,7 @@ Risks and rollback. Dual-theme images can flash on load if switched with JavaScr
 | Size       | S               |
 | Depends on | SINGULARITY-042 |
 | Unlocks    | none            |
+| Status     | Complete        |
 
 Objective. Give readers a next step at the end of a post, satisfying the final step of journey J3.
 
@@ -1918,7 +2000,56 @@ yarn test
 yarn build
 ```
 
+Implementation evidence, 2026-09-18.
+
+- The post layout delegates previous, next, and related links to a Server Component that renders post titles and returns nothing when no destinations exist.
+- Pure content helpers prefer neighbors in the same series, fall back to chronological neighbors, and rank at most three related posts by tag overlap with a date tie-break.
+- Focused unit tests cover series-first ordering, first and last boundaries, missing posts, related-post ranking, current-post exclusion, and the three-post cap.
+- The one-post production route renders no empty navigation or related-post region.
+
 Risks and rollback. With one post, most of this is untestable against real content. Unit-test the logic with fixtures instead. Rollback: revert the files.
+
+### SINGULARITY-070 Rebuild the tags index
+
+| Field      | Value                                             |
+| ---------- | ------------------------------------------------- |
+| Phase      | P4                                                |
+| Size       | S                                                 |
+| Depends on | SINGULARITY-009, SINGULARITY-013, SINGULARITY-044 |
+| Unlocks    | none                                              |
+| Status     | Complete                                          |
+
+Objective. Bring `/tags` onto the design system. The route was never assigned to a task, so it survived the transformation as untouched starter markup while every other surface moved.
+
+Scope. The tags index page only. Non-goals: tag detail pages, which `SINGULARITY-044` already covers.
+
+Files. `app/(site)/tags/page.tsx`.
+
+Implementation notes. `Evidence`: the page carried `divide-gray-200`, `text-3xl font-extrabold`, and `md:leading-14`, none of which exist in the observatory scales, and it rendered each tag twice, once through the `Tag` component and once as a separate count link pointing at the same URL. Two adjacent links to one destination are a duplicate-link defect for screen-reader and keyboard users. Render one link per tag carrying both the name and the count.
+
+Acceptance criteria.
+
+- A single `h1` and a short description of the page's purpose.
+- One link per tag, carrying the tag name and its post count.
+- Tags ordered by count, with an alphabetical tie-break so ordering is stable between builds.
+- Every link is at least 24 by 24 CSS pixels and shows a visible focus indicator.
+- Empty state handled.
+- No gray-ramp or default Tailwind type utility remains.
+
+Validation.
+
+```bash
+yarn typecheck
+yarn build
+```
+
+Implementation evidence, 2026-09-19.
+
+- The page renders a display heading, a serif lead paragraph, and one bordered link per tag using the boundary, ink, and accent tokens.
+- Ordering falls back to `localeCompare` when two tags share a count, which removes the previous build-to-build instability.
+- The duplicate count link is gone; the count now sits inside the single tag link as muted tabular numerals.
+
+Risks and rollback. Low. Rollback: revert the file.
 
 ## Phase P5: Optional integrations
 
@@ -1926,50 +2057,61 @@ Every task here is independently cuttable and none blocks launch.
 
 ### SINGULARITY-048 Dynamic Open Graph image generation
 
-| Field      | Value                            |
-| ---------- | -------------------------------- |
-| Phase      | P5                               |
-| Size       | M                                |
-| Depends on | SINGULARITY-004, SINGULARITY-011 |
-| Unlocks    | none                             |
+| Field      | Value                                                   |
+| ---------- | ------------------------------------------------------- |
+| Phase      | P5                                                      |
+| Size       | M                                                       |
+| Depends on | SINGULARITY-004, SINGULARITY-011                        |
+| Unlocks    | none                                                    |
+| Status     | Implementation complete; external preview check pending |
 
 Objective. Generate a distinct social card per post and per project, replacing the single site-wide banner.
 
-Scope. One edge route and the metadata wiring. Non-goals: per-page custom artwork.
+Scope. One prerendered route and the metadata wiring. Non-goals: per-page custom artwork.
 
-Files. `app/og/[...slug]/route.tsx`, `app/seo.ts`, `app/(site)/blog/[...slug]/page.tsx`, `app/(site)/projects/[slug]/page.tsx`.
+Files. `app/og/[...slug]/route.tsx`, `app/seo.tsx`, `app/(site)/blog/[...slug]/page.tsx`, `app/(site)/projects/[slug]/page.tsx`.
 
-Implementation notes. Follow whatever font-loading approach `SINGULARITY-004` proved. `Evidence`: [app/layout.tsx](../../../app/layout.tsx) points every Open Graph and Twitter image at `siteMetadata.socialBanner`. Replace that per route while keeping a static default for pages with no dynamic card. Cache aggressively with immutable headers; the content is deterministic for a given slug. Design the card to the observatory identity: title, a type label, and a wordmark. Titles must truncate gracefully rather than overflow.
+Implementation notes. Follow whatever font-loading approach `SINGULARITY-004` proved. `Evidence`: [app/layout.tsx](../../../app/layout.tsx) points every Open Graph and Twitter image at `siteMetadata.socialBanner`. Replace that per route while keeping a static default for pages with no dynamic card. The route declares `dynamic = 'force-static'` with `generateStaticParams`, so the cards are emitted at build time and the degraded export profile keeps working. Design the card to the observatory identity: title, a type label, and a wordmark. Titles must truncate gracefully rather than overflow.
 
 Acceptance criteria.
 
 - A distinct image renders for each post and project.
 - Correct dimensions at 1200 by 630.
 - Long titles truncate without overflow.
-- Immutable cache headers set.
+- The route is prerendered, so both the primary and degraded export builds emit every card.
 - Metadata references the dynamic URL for posts and projects, and a static default elsewhere.
+- The static default is a raster format that social platforms render.
 - Verified in a social preview debugger for at least two URLs.
-- Generation completes in under 1 second cold.
 
 Validation.
 
 ```bash
 yarn build
-yarn serve
+EXPORT=1 UNOPTIMIZED=1 yarn build
 ```
 
-Then request the image routes directly and check them in a preview debugger.
+Implementation evidence, 2026-09-19.
+
+- One route resolves published posts and projects to distinct 1200 by 630 PNG cards. `dynamicParams` is disabled, so unknown slugs return a 404.
+- Blog and project metadata reference canonical dynamic image URLs for Open Graph and Twitter. Other routes retain the static banner.
+- The shipped Inter asset is WOFF2-only, which Satori rejects with `Unsupported OpenType signature wOF2`. The route therefore uses Satori's bundled sans face rather than adding a second font binary. A compatible static Inter TTF or WOFF subset remains a visual follow-up.
+- Card colours now match the plate surface and the starlight accent rather than approximations of the starter palette.
+
+Correction, 2026-09-19. The first implementation declared `runtime = 'edge'`, which made the route dynamic and broke `EXPORT=1 UNOPTIMIZED=1 yarn build` with `Failed to collect page data for /og/[...slug]`. That regressed a `SINGULARITY-003` and `SINGULARITY-069` exit criterion without either task being reopened. The route is now prerendered on the Node runtime and both build profiles pass, emitting four cards into `out/og/`.
+
+Correction, 2026-09-19. `siteMetadata.socialBanner` pointed at an SVG. X, Facebook, LinkedIn, and Slack all reject SVG for Open Graph, so every route without a dynamic card had no preview image. The banner is now a 1200 by 630 PNG rasterised from the same artwork.
 
 Risks and rollback. If `SINGULARITY-004` returned a negative verdict, withdraw this task and keep a small set of static section banners. Rollback: revert to the static banner.
 
 ### SINGULARITY-049 Scope and theme Giscus comments
 
-| Field      | Value                            |
-| ---------- | -------------------------------- |
-| Phase      | P5                               |
-| Size       | S                                |
-| Depends on | SINGULARITY-041, SINGULARITY-069 |
-| Unlocks    | none                             |
+| Field      | Value                                                     |
+| ---------- | --------------------------------------------------------- |
+| Phase      | P5                                                        |
+| Size       | S                                                         |
+| Depends on | SINGULARITY-041, SINGULARITY-069                          |
+| Unlocks    | none                                                      |
+| Status     | Implementation complete; deployment configuration pending |
 
 Objective. Keep comments on blog posts only, preserve the click-to-load gate, and match the site theme.
 
@@ -1999,16 +2141,25 @@ yarn serve
 
 Then check the network panel before and after clicking load.
 
+Implementation evidence, 2026-09-19.
+
+- The first-party wrapper now lives under `components/blog/` and is imported only by the blog post layout.
+- Giscus remains unmounted until the visitor selects **Load comments**. Missing repository or category configuration renders no comment surface.
+- The built-in `noborder_light` and `dark_dimmed` themes follow the resolved site theme without a separately hosted stylesheet.
+- Focused tests cover the pre-click boundary, light and dark theme updates, and absent configuration.
+- The four required deployment variables are documented in `.env.example`; the owner has not configured them yet. `frame-src giscus.app` remains in the policy.
+
 Risks and rollback. Rollback: revert the file. Comments are non-essential.
 
 ### SINGULARITY-050 Wire Umami analytics
 
-| Field      | Value                            |
-| ---------- | -------------------------------- |
-| Phase      | P5                               |
-| Size       | S                                |
-| Depends on | SINGULARITY-020, SINGULARITY-069 |
-| Unlocks    | none                             |
+| Field      | Value                                                 |
+| ---------- | ----------------------------------------------------- |
+| Phase      | P5                                                    |
+| Size       | S                                                     |
+| Depends on | SINGULARITY-020, SINGULARITY-069                      |
+| Unlocks    | none                                                  |
+| Status     | Implementation complete; enablement deferred by owner |
 
 Objective. Enable page-view analytics with no custom events only after recording the deployment-specific privacy decision.
 
@@ -2038,6 +2189,15 @@ yarn build
 
 Then deploy a preview and confirm both the beacon and the absence of cookies.
 
+Implementation evidence and privacy decision, 2026-09-19.
+
+- The owner deferred Umami for this release. No hosting mode, retention period, or processing jurisdiction is selected, and no notice or consent determination is required while the website ID remains unset.
+- `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is the explicit enablement gate. Without it, production renders no analytics script and emits no console error.
+- `NEXT_PUBLIC_UMAMI_SCRIPT_URL` supports Umami Cloud or a future self-hosted deployment. The configured script origin is included explicitly in both `script-src` and `connect-src`.
+- The integration enables automatic page views only and declares no custom events. Focused tests cover disabled, development, and configured-production states.
+- The retired analytics, comment-provider, and newsletter variables were removed from `.env.example`.
+- Preview beacon, cookie, retention, jurisdiction, and transfer checks remain mandatory before setting the website ID.
+
 Risks and rollback. Rollback: unset the environment variable. Nothing else depends on it.
 
 ### SINGULARITY-051 Verify and restyle local search
@@ -2048,6 +2208,7 @@ Risks and rollback. Rollback: unset the environment variable. Nothing else depen
 | Size       | S                                                 |
 | Depends on | SINGULARITY-015, SINGULARITY-045, SINGULARITY-069 |
 | Unlocks    | none                                              |
+| Status     | Complete                                          |
 
 Objective. Verify the `cmdk` and MiniSearch replacement from `SINGULARITY-069` against the final content index and restyle it to the observatory tokens.
 
@@ -2076,16 +2237,26 @@ yarn build
 yarn serve
 ```
 
+Implementation evidence, 2026-09-19.
+
+- The generated local index contains both posts and projects, title matches receive the highest boost, and result sets remain capped at eight.
+- The dialog retains deferred loading, keyboard and button entry, Escape handling, focus restoration, and project lookup under focused unit coverage.
+- Dialog surfaces, boundaries, text, selection, and focus styling now use observatory semantic tokens in both themes.
+- Desktop and 390-pixel browser checks confirmed that the responsive dialog remains within the viewport without text overlap.
+
+Correction, 2026-09-19. The dialog was deferred in data but not in code. `SearchProvider` sat in the shell layout and imported `cmdk` and MiniSearch statically, so their JavaScript shipped on every route even though the index fetch waited for first open. The provider is now a small client shell that owns the shortcut, open state, and focus restoration, and `components/search/command-menu.tsx` holds the dialog behind `React.lazy`. The libraries land in a chunk that no route loads on first paint.
+
 Risks and rollback. Extending the index to include projects may require changes to the selected engine's transform or the explicit artifact script from `SINGULARITY-003`. If that grows, ship posts-only search and record the project-search gap. Rollback: revert styling and ranking changes, not the P0 replacement.
 
 ### SINGULARITY-052 Extend structured data
 
-| Field      | Value                            |
-| ---------- | -------------------------------- |
-| Phase      | P5                               |
-| Size       | M                                |
-| Depends on | SINGULARITY-020, SINGULARITY-028 |
-| Unlocks    | none                             |
+| Field      | Value                                                |
+| ---------- | ---------------------------------------------------- |
+| Phase      | P5                                                   |
+| Size       | M                                                    |
+| Depends on | SINGULARITY-020, SINGULARITY-028                     |
+| Unlocks    | none                                                 |
+| Status     | Implementation complete; external validation pending |
 
 Objective. Extend JSON-LD beyond blog posts so that a search for Matthew's name resolves to the correct entity.
 
@@ -2114,6 +2285,14 @@ yarn serve
 ```
 
 Then validate each route in the Rich Results Test.
+
+Implementation evidence, 2026-09-19.
+
+- Typed first-party builders now produce `WebSite`, `Person`, and `BreadcrumbList` graphs with canonical absolute URLs. Existing content generation continues to own `BlogPosting`.
+- The site layout emits one `WebSite` graph. About and resume emit `Person`; blog posts and project details emit navigation-accurate breadcrumbs.
+- `Person.sameAs` publishes the owner-approved GitHub and LinkedIn profiles, includes job title and education, and contains no telephone field.
+- Focused tests cover canonical website identity, breadcrumb order, approved person fields, dynamic image URLs, and absence of telephone data.
+- Production HTML contains the expected `WebSite` and `BreadcrumbList` graphs. Rich Results Test validation remains deployment-dependent.
 
 Risks and rollback. `sameAs` on `Person` publishes social profiles as machine-readable links, which is intended but should be a conscious choice. Rollback: revert `lib/seo.ts`.
 

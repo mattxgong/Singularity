@@ -15,6 +15,7 @@
     "lint": "eslint app components layouts lib scripts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check:sensitive": "python scripts/check-sensitive-data.py public/resume/matthew-gong-resume.pdf",
     "prepare": "husky"
   },
   "dependencies": {

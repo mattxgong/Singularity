@@ -2,23 +2,20 @@ import { Badge } from '@/components/ui/badge'
 import { Section } from '@/components/ui/section'
 import { awards, education, profile, siteMetadata, skillGroups } from '@/data/index'
 import { formatPeriod } from '@/lib/format'
+import { createPersonJsonLd } from '@/lib/seo'
 import { genPageMetadata } from 'app/seo'
 
 export const metadata = genPageMetadata({ title: 'About' })
 
 export default function Page() {
-  const personJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
+  const personJsonLd = createPersonJsonLd({
     name: profile.name,
-    url: siteMetadata.siteUrl,
-    email: `mailto:${profile.email}`,
+    url: `${siteMetadata.siteUrl}/about`,
+    email: profile.email,
+    jobTitle: profile.status,
     sameAs: [siteMetadata.github, siteMetadata.linkedin],
-    alumniOf: education.map((entry) => ({
-      '@type': 'CollegeOrUniversity',
-      name: entry.institution,
-    })),
-  }
+    education: education.map((entry) => entry.institution),
+  })
 
   return (
     <>

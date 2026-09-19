@@ -1,6 +1,6 @@
 import { slug } from 'github-slugger'
 import { allCoreContent, sortPosts } from '@/lib/content'
-import ListLayout from '@/layouts/ListLayoutWithTags'
+import ListLayout from '@/layouts/list-layout-with-tags'
 import { allBlogs } from 'content-collections'
 import tagData from 'app/tag-data.json'
 import { notFound } from 'next/navigation'
@@ -48,6 +48,8 @@ export default async function TagPage(props: { params: Promise<{ tag: string; pa
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
       title={title}
+      basePath={`tags/${tag}`}
+      currentTag={tag}
     />
   )
 }

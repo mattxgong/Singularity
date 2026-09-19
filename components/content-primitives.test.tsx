@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import Bleed from './Bleed'
 import CodeBlock from './CodeBlock'
-import { components } from './MDXComponents'
+import { components } from './mdx/mdx-components'
 import TableOfContents from './TableOfContents'
 
 describe('content primitives', () => {

@@ -84,7 +84,9 @@ export default function TableOfContents({
 
   return (
     <details open={!collapse}>
-      <summary className="ml-6 pt-2 pb-2 text-xl font-bold">Table of Contents</summary>
+      <summary className="text-heading-4 ml-6 pt-2 pb-2 font-sans font-bold">
+        Table of Contents
+      </summary>
       <div className="ml-6">{list}</div>
     </details>
   )

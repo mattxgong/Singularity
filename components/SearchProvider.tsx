@@ -1,20 +1,10 @@
 'use client'
 
-import { Command } from 'cmdk'
-import MiniSearch from 'minisearch'
-import { useRouter } from 'next/navigation'
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import { siteMetadata } from '@/data/index'
+import { Suspense, createContext, lazy, useContext, useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 
-interface SearchDocument {
-  id: string
-  title: string
-  summary?: string
-  description?: string
-  tags?: string[]
-  href: string
-  kind: 'post' | 'project'
-}
+// Lazy so cmdk and MiniSearch stay out of the shell's shared chunk.
+const CommandMenu = lazy(() => import('@/components/search/command-menu'))
 
 interface SearchContextValue {
   openSearch: () => void
@@ -29,132 +19,43 @@ export function useSearch() {
 }
 
 export default function SearchProvider({ children }: { children: ReactNode }) {
-  const router = useRouter()
   const triggerRef = useRef<HTMLElement | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const searchRef = useRef<MiniSearch<SearchDocument> | null>(null)
+  const openRef = useRef(false)
   const [open, setOpen] = useState(false)
-  const [query, setQuery] = useState('')
-  const [documents, setDocuments] = useState<SearchDocument[]>([])
-  const [results, setResults] = useState<SearchDocument[]>([])
-  const [loading, setLoading] = useState(false)
-
-  function openSearch() {
-    triggerRef.current = document.activeElement as HTMLElement
-    setOpen(true)
-  }
+  const [mounted, setMounted] = useState(false)
 
   function changeOpen(nextOpen: boolean) {
+    if (nextOpen) {
+      triggerRef.current = document.activeElement as HTMLElement
+      setMounted(true)
+    } else {
+      requestAnimationFrame(() => triggerRef.current?.focus())
+    }
+    openRef.current = nextOpen
     setOpen(nextOpen)
-    if (!nextOpen) requestAnimationFrame(() => triggerRef.current?.focus())
   }
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        setOpen((current) => {
-          if (!current) triggerRef.current = document.activeElement as HTMLElement
-          else requestAnimationFrame(() => triggerRef.current?.focus())
-          return !current
-        })
+        changeOpen(!openRef.current)
       }
     }
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
+    // changeOpen only touches refs and setState, so a single subscription is correct.
   }, [])
 
-  useEffect(() => {
-    if (open) requestAnimationFrame(() => inputRef.current?.focus())
-  }, [open])
-
-  useEffect(() => {
-    if (!open || documents.length) return
-
-    const controller = new AbortController()
-    setLoading(true)
-    fetch(siteMetadata.search?.searchDocumentsPath ?? '/search.json', { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Search index request failed: ${response.status}`)
-        return response.json() as Promise<SearchDocument[]>
-      })
-      .then(setDocuments)
-      .catch((error) => {
-        if (error instanceof Error && error.name !== 'AbortError') console.error(error)
-      })
-      .finally(() => setLoading(false))
-
-    return () => controller.abort()
-  }, [documents.length, open])
-
-  useEffect(() => {
-    if (!open) {
-      searchRef.current = null
-      return
-    }
-    if (!documents.length || searchRef.current) return
-
-    const search = new MiniSearch<SearchDocument>({
-      fields: ['title', 'summary', 'description', 'tags'],
-      storeFields: ['id', 'title', 'summary', 'description', 'tags', 'href', 'kind'],
-      searchOptions: { boost: { title: 3 }, prefix: true, fuzzy: 0.2 },
-    })
-    search.addAll(documents)
-    searchRef.current = search
-    setResults(documents.slice(0, 8))
-  }, [documents, open])
-
-  useEffect(() => {
-    if (!open || !searchRef.current) return
-    setResults(
-      query.trim()
-        ? (searchRef.current.search(query).slice(0, 8) as unknown as SearchDocument[])
-        : documents.slice(0, 8)
-    )
-  }, [documents, open, query])
-
-  function selectResult(href: string) {
-    changeOpen(false)
-    if (/^https?:\/\//.test(href)) window.location.assign(href)
-    else router.push(href)
-  }
-
   return (
-    <SearchContext.Provider value={{ openSearch }}>
+    <SearchContext.Provider value={{ openSearch: () => changeOpen(true) }}>
       {children}
-      <Command.Dialog
-        open={open}
-        onOpenChange={changeOpen}
-        label="Search"
-        shouldFilter={false}
-        className="fixed inset-x-4 top-[15vh] z-50 mx-auto max-w-xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900"
-      >
-        <Command.Input
-          ref={inputRef}
-          value={query}
-          onValueChange={setQuery}
-          placeholder="Search posts and projects"
-          className="w-full border-0 border-b border-gray-200 bg-transparent px-4 py-3 text-gray-900 outline-none dark:border-gray-700 dark:text-gray-100"
-        />
-        <Command.List className="max-h-96 overflow-y-auto p-2">
-          {loading && <Command.Loading className="p-4 text-gray-500">Loading...</Command.Loading>}
-          {!loading && query && !results.length && (
-            <Command.Empty className="p-4 text-gray-500">No results found.</Command.Empty>
-          )}
-          {results.map((result) => (
-            <Command.Item
-              key={result.id}
-              value={result.id}
-              onSelect={() => selectResult(result.href)}
-              className="data-[selected=true]:bg-primary-100 dark:data-[selected=true]:bg-primary-900 cursor-pointer rounded px-3 py-2"
-            >
-              <span className="block font-medium">{result.title}</span>
-              <span className="block text-sm text-gray-500 capitalize">{result.kind}</span>
-            </Command.Item>
-          ))}
-        </Command.List>
-      </Command.Dialog>
+      {mounted && (
+        <Suspense fallback={null}>
+          <CommandMenu open={open} onOpenChange={changeOpen} />
+        </Suspense>
+      )}
     </SearchContext.Provider>
   )
 }

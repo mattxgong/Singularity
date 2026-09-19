@@ -177,7 +177,7 @@ Every meaningful capability in the current repository, classified. `retain` mean
 | `MDXComponents`                           | replace | Move to a first-party map for the selected engine; remove Pliny and `BlogNewsletterForm`, then add callouts, figures, and code groups.                                                      |
 | `TableWrapper`, `PageTitle`, social icons | retain  | Small and correct.                                                                                                                                                                          |
 | Design-system primitives                  | add     | No `Button`, `Badge`, `Prose`, or `Card` primitive exists. Everything is ad-hoc Tailwind.                                                                                                   |
-| Starfield component                       | add     | D4. Canvas 2D, isolated leaf, reduced-motion aware.                                                                                                                                         |
+| Starfield component                       | add     | D4. Static SVG, Server Component, no animation after the SINGULARITY-005 measurement.                                                                                                       |
 
 ### Content and data
 

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Observable multi-agent workflow</title>
+  <desc id="desc">Intake flows to plan, execute, validate, and complete. Failed validation returns to execution.</desc>
+  <rect width="1200" height="560" fill="#f8f6ef" />
+  <g fill="none" stroke="#172033" stroke-width="3">
+    <path d="M220 220h80M500 220h80M780 220h80" />
+    <path d="M960 280v110H680V280" stroke="#b23a48" />
+  </g>
+  <g fill="#172033">
+    <path d="m292 210 18 10-18 10zM572 210l18 10-18 10zM852 210l18 10-18 10z" />
+    <path d="m670 288 10-18 10 18z" fill="#b23a48" />
+  </g>
+  <g font-family="sans-serif" text-anchor="middle">
+    <g fill="#ffffff" stroke="#172033" stroke-width="3">
+      <rect x="40" y="160" width="180" height="120" rx="6" fill="#26344f" />
+      <rect x="300" y="160" width="200" height="120" rx="6" fill="#26344f" />
+      <rect x="580" y="160" width="200" height="120" rx="6" fill="#26344f" />
+      <rect x="860" y="160" width="200" height="120" rx="6" fill="#26344f" />
+    </g>
+    <g fill="#ffffff" font-size="28" font-weight="600">
+      <text x="130" y="230">Intake</text>
+      <text x="400" y="230">Plan</text>
+      <text x="680" y="230">Execute</text>
+      <text x="960" y="230">Validate</text>
+    </g>
+    <text x="820" y="430" fill="#b23a48" font-size="24" font-weight="600">repair with evidence</text>
+    <text x="600" y="92" fill="#172033" font-size="34" font-weight="700">Explicit transitions, inspectable evidence</text>
+  </g>
+</svg>

@@ -1,27 +1,36 @@
 import 'css/prism.css'
 import 'katex/dist/katex.css'
 
-import { components } from '@/components/MDXComponents'
+import { components } from '@/components/mdx/mdx-components'
 import { MDXContent } from '@content-collections/mdx/react'
-import { sortPosts, coreContent, allCoreContent } from '@/lib/content'
+import {
+  sortPosts,
+  coreContent,
+  allCoreContent,
+  getPostNavigation,
+  getRelatedPosts,
+} from '@/lib/content'
 import { allBlogs } from 'content-collections'
 import type { Blog } from 'content-collections'
-import PostSimple from '@/layouts/PostSimple'
-import PostLayout from '@/layouts/PostLayout'
-import PostBanner from '@/layouts/PostBanner'
+import PostLayout from '@/layouts/post-layout'
+import type { PostLayoutVariant } from '@/layouts/post-layout'
 import { Metadata } from 'next'
 import { siteMetadata } from '@/data/index'
+import { createBreadcrumbJsonLd, createSocialImageUrl } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 
-const defaultLayout = 'PostLayout' as const
-const layouts = {
-  PostSimple,
-  PostLayout,
-  PostBanner,
-}
+const layoutVariants = {
+  PostLayout: 'default',
+  PostSimple: 'minimal',
+  PostBanner: 'banner',
+} satisfies Record<string, PostLayoutVariant>
 
-function isLayoutName(value: string | undefined): value is keyof typeof layouts {
-  return value !== undefined && value in layouts
+function getLayoutVariant(layout: string | undefined): PostLayoutVariant {
+  if (layout && layout in layoutVariants) {
+    return layoutVariants[layout as keyof typeof layoutVariants]
+  }
+
+  return 'default'
 }
 
 export async function generateMetadata(props: {
@@ -36,15 +45,7 @@ export async function generateMetadata(props: {
 
   const publishedAt = new Date(post.date).toISOString()
   const modifiedAt = new Date(post.lastmod || post.date).toISOString()
-  let imageList = [siteMetadata.socialBanner]
-  if (post.images) {
-    imageList = typeof post.images === 'string' ? [post.images] : post.images
-  }
-  const ogImages = imageList.map((img) => {
-    return {
-      url: img && img.includes('http') ? img : siteMetadata.siteUrl + img,
-    }
-  })
+  const socialImage = createSocialImageUrl(siteMetadata.siteUrl, 'blog', post.slug)
 
   return {
     title: post.title,
@@ -58,20 +59,22 @@ export async function generateMetadata(props: {
       publishedTime: publishedAt,
       modifiedTime: modifiedAt,
       url: './',
-      images: ogImages,
+      images: [{ url: socialImage, width: 1200, height: 630, alt: post.title }],
       authors: [siteMetadata.author],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.summary,
-      images: imageList,
+      images: [socialImage],
     },
   }
 }
 
 export const generateStaticParams = async () => {
-  return allBlogs.map((p) => ({ slug: p.slug.split('/').map((name) => decodeURI(name)) }))
+  return allCoreContent(sortPosts(allBlogs)).map((post) => ({
+    slug: post.slug.split('/').map((name) => decodeURI(name)),
+  }))
 }
 
 export default async function Page(props: { params: Promise<{ slug: string[] }> }) {
@@ -79,14 +82,17 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const slug = decodeURI(params.slug.join('/'))
   // Filter out drafts in production
   const sortedCoreContents = allCoreContent(sortPosts(allBlogs))
-  const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug)
-  if (postIndex === -1) {
+  if (!sortedCoreContents.some((candidate) => candidate.slug === slug)) {
     return notFound()
   }
 
-  const prev = sortedCoreContents[postIndex + 1]
-  const next = sortedCoreContents[postIndex - 1]
-  const post = allBlogs.find((p) => p.slug === slug) as Blog
+  const post = allBlogs.find((p) => p.slug === slug)
+  if (!post) {
+    return notFound()
+  }
+
+  const { prev, next } = getPostNavigation(sortedCoreContents, slug)
+  const related = getRelatedPosts(sortedCoreContents, slug)
   const mainContent = coreContent(post)
   const jsonLd = {
     ...post.structuredData,
@@ -95,8 +101,13 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
       name: siteMetadata.author,
     },
   }
+  const breadcrumbJsonLd = createBreadcrumbJsonLd(siteMetadata.siteUrl, [
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog' },
+    { name: post.title, path: `/blog/${post.slug}` },
+  ])
 
-  const Layout = layouts[isLayoutName(post.layout) ? post.layout : defaultLayout]
+  const variant = getLayoutVariant(post.layout)
 
   return (
     <>
@@ -104,9 +115,13 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Layout content={mainContent} next={next} prev={prev}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <PostLayout content={mainContent} variant={variant} next={next} prev={prev} related={related}>
         <MDXContent code={post.mdx} components={components} toc={post.toc} />
-      </Layout>
+      </PostLayout>
     </>
   )
 }

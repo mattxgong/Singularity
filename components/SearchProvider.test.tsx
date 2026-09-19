@@ -30,7 +30,7 @@ describe('SearchProvider', () => {
     expect(fetchMock).not.toHaveBeenCalled()
     trigger.focus()
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
-    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', {}, { timeout: 5000 })).toBeInTheDocument()
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
 
     fireEvent.change(screen.getByPlaceholderText('Search posts and projects'), {

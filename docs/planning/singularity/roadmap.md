@@ -38,7 +38,7 @@ Exit criteria:
 - `contentlayer2`, `next-contentlayer2`, `pliny`, their aliases, and their imports are absent from source, package metadata, and the lockfile.
 - Search, comments, analytics, MDX rendering, content helpers, date formatting, RSS escaping, and newsletter removal have explicit replacements or deletion evidence.
 - Dynamic Open Graph image generation is demonstrated with a self-hosted font, or the fallback is chosen.
-- A starfield prototype has measured frame cost on a throttled profile against the 2 millisecond budget.
+- A starfield prototype has measured frame cost on a throttled profile against the 2 millisecond budget, and the verdict governs `SINGULARITY-026`.
 - The TypeScript strict-mode error count is known and categorized against the migrated stack.
 - Baseline Lighthouse and bundle numbers are recorded for later comparison.
 
@@ -85,8 +85,8 @@ Exit criteria:
 - A skip link is the first focusable element on every route, and landmarks are correct.
 - Site metadata is typed TypeScript with every placeholder value replaced.
 - The P0 newsletter deletion remains complete and the build has no references to it.
-- The starfield is mounted, honours reduced motion, is absent below the medium breakpoint, and adds no more than 8 KB gzipped.
-- The client component list matches the eleven entries permitted in [architecture.md](architecture.md).
+- The decorative layer is the static SVG on every viewport, renders in both themes, and adds no client JavaScript.
+- The client component list matches the entries permitted in [architecture.md](architecture.md).
 
 Gate: keyboard-only navigation of the shell works end to end, verified manually, before content pages are built on top of it.
 
@@ -497,7 +497,7 @@ Automated checks catch regressions. Manual checks catch the things automation is
 Run at every phase gate. Not automatable, and the automation that claims to cover it does not.
 
 - Tab through the entire page. Focus is always visible, order is logical, nothing is reachable but invisible.
-- Set the operating system to reduced motion. Confirm the canvas starfield does not load at all, and that no transition exceeds a perceptible duration.
+- Set the operating system to reduced motion. Confirm that no transition exceeds a perceptible duration. The decorative layer is static SVG and ships no animation.
 - Disable JavaScript. Confirm navigation, reading, project browsing, and the resume download all still work.
 - Toggle light, dark, and system. Confirm no flash of the wrong theme and no illegible pairing.
 - Load on a real phone over a real cellular connection, not a throttled desktop profile.

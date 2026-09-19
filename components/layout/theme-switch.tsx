@@ -1,16 +1,8 @@
 'use client'
 
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Radio,
-  RadioGroup,
-  Transition,
-} from '@headlessui/react'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { cn } from '@/lib/cn'
 
 const iconClassName = 'h-5 w-5'
@@ -69,37 +61,30 @@ export default function ThemeSwitch() {
       >
         {mounted ? resolvedTheme === 'dark' ? <Moon /> : <Sun /> : <Blank />}
       </MenuButton>
-      <Transition
-        as={Fragment}
-        enter="transition duration-fast ease-standard"
-        enterFrom="scale-95 opacity-0"
-        enterTo="scale-100 opacity-100"
-        leave="transition duration-fast ease-standard"
-        leaveFrom="scale-100 opacity-100"
-        leaveTo="scale-95 opacity-0"
+      <MenuItems
+        transition
+        className="border-boundary bg-surface-raised mt-rhythm-2 duration-fast ease-standard absolute right-0 z-50 w-36 origin-top-right rounded-sm border p-1 shadow-lg transition focus:outline-hidden data-closed:scale-95 data-closed:opacity-0"
       >
-        <MenuItems className="border-boundary bg-surface-raised mt-rhythm-2 absolute right-0 z-50 w-36 origin-top-right rounded-sm border p-1 shadow-lg focus:outline-hidden">
-          <RadioGroup value={theme} onChange={setTheme}>
-            {options.map(({ value, label, icon: Icon }) => (
-              <Radio key={value} value={value}>
-                <MenuItem>
-                  {({ focus }) => (
-                    <button
-                      className={cn(
-                        'gap-rhythm-2 text-small text-ink flex min-h-10 w-full items-center rounded-sm px-3 py-2 font-sans',
-                        focus && 'bg-surface text-accent'
-                      )}
-                    >
-                      <Icon />
-                      {label}
-                    </button>
-                  )}
-                </MenuItem>
-              </Radio>
-            ))}
-          </RadioGroup>
-        </MenuItems>
-      </Transition>
+        {options.map(({ value, label, icon: Icon }) => (
+          <MenuItem key={value}>
+            {({ focus }) => (
+              <button
+                type="button"
+                onClick={() => setTheme(value)}
+                aria-current={theme === value ? 'true' : undefined}
+                className={cn(
+                  'gap-rhythm-2 text-small text-ink flex min-h-10 w-full items-center rounded-sm px-3 py-2 font-sans',
+                  focus && 'bg-surface text-accent',
+                  theme === value && 'font-semibold'
+                )}
+              >
+                <Icon />
+                {label}
+              </button>
+            )}
+          </MenuItem>
+        ))}
+      </MenuItems>
     </Menu>
   )
 }

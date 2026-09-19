@@ -1,4 +1,4 @@
-import ListLayout from '@/layouts/ListLayoutWithTags'
+import ListLayout from '@/layouts/list-layout-with-tags'
 import { allCoreContent, sortPosts } from '@/lib/content'
 import { allBlogs } from 'content-collections'
 import { notFound } from 'next/navigation'
@@ -37,6 +37,7 @@ export default async function Page(props: { params: Promise<{ page: string }> })
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
       title="All Posts"
+      basePath="blog"
     />
   )
 }

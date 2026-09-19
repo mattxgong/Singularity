@@ -22,7 +22,7 @@ describe('navigation', () => {
     trigger.focus()
     fireEvent.click(trigger)
 
-    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(
       within(screen.getByRole('navigation', { name: 'Mobile' })).getAllByRole('link')
     ).toHaveLength(5)

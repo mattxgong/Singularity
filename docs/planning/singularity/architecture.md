@@ -72,17 +72,19 @@ The consolidated layout takes a `variant` derived from the existing `layout` fro
 
 Reversal trigger: if the variants diverge enough that the single component develops more than two conditional branches, split it again.
 
-### A5: Starfield as an isolated client leaf
+### A5: Starfield as a static server-rendered layer
 
-Chosen: a `<canvas>` rendered by a dynamically imported client component, mounted once in the site shell layout, positioned fixed behind all content.
+Chosen: an inline SVG rendered by a Server Component, placed once in the site shell layout, positioned fixed behind all content.
 
-Rejected: a client component wrapping page content, and a CSS-only animated background.
+Rejected: a `<canvas>` client component, a client component wrapping page content, and a CSS-only animated background.
 
 The wrapper approach is rejected because it would convert the entire subtree into client components, destroying the seven-file client boundary documented in [research.md](research.md). This is the single most important architectural constraint in the project.
 
-CSS-only was seriously considered and is the fallback. It cannot express parallax depth or twinkle variation convincingly at low cost, and multiple animated `box-shadow` layers, the usual technique, are surprisingly expensive to composite. Canvas 2D with a capped device pixel ratio and a capped star count is cheaper and more controllable.
+Canvas 2D was the original choice and remained so through the design phase. `SINGULARITY-005` then measured it: the single-canvas prototype held roughly 1.06 milliseconds mean draw at 4 times throttling, but at 6 times it reached 1.82 milliseconds mean and produced an 81 millisecond long task, and a five-minute run reached 5.29 milliseconds mean with forty long tasks. That fails both the 2 millisecond frame budget and the 50 millisecond long-task threshold, so the reversal trigger fired and the Canvas module was withdrawn.
 
-Reversal trigger: if `SINGULARITY-005` cannot hold the 2 millisecond frame budget on a mid-tier device, drop to the static SVG for all viewports. The fallback already exists by design, so reversal costs nothing but the deleted module.
+The shipped layer is therefore the static SVG that was always the designated fallback: a coordinate grid, a scattered star pattern, and an instrument reticle, drawn with the theme's semantic colour tokens so it follows both themes without JavaScript. It costs zero kilobytes of client script, needs no reduced-motion branch, and renders identically on every viewport.
+
+Reversal trigger: reintroducing motion requires a fresh measurement that clears the 2 millisecond frame budget and the long-task threshold at 6 times throttling, recorded against an amended `SINGULARITY-005`.
 
 ### A6: Projects as typed data plus optional MDX
 
@@ -204,9 +206,7 @@ singularity/
 │   │   ├── tag.tsx                         [moved]    From components/Tag.tsx.
 │   │   └── comments.tsx                    [moved]    From components/Comments.tsx. Client.
 │   ├── decorative/                         [new]
-│   │   ├── starfield.tsx                   [new]      Client leaf. Canvas 2D. aria-hidden.
-│   │   ├── starfield-static.tsx            [new]      SVG fallback. Server component.
-│   │   └── star-field-mount.tsx            [new]      Chooses canvas or static. Client.
+│   │   └── starfield-static.tsx            [new]      SVG artwork. Server component. aria-hidden.
 │   ├── mdx/                                [new]
 │   │   ├── mdx-components.tsx              [moved]    From components/MDXComponents.tsx.
 │   │   ├── figure.tsx                      [new]      Image plus caption plus dual-theme source.
@@ -332,27 +332,38 @@ Every route is a Server Component. Every page renders its full content, includin
 
 The complete permitted client set after transformation:
 
-| Component                                    | Reason                                   |
-| -------------------------------------------- | ---------------------------------------- |
-| `app/theme-providers.tsx`                    | `next-themes` context                    |
-| `components/layout/theme-switch.tsx`         | Reads and sets theme state               |
-| `components/layout/mobile-nav.tsx`           | Dialog state and body scroll lock        |
-| `components/blog/comments.tsx`               | Click-to-load gate for the Giscus iframe |
-| `components/blog/table-of-contents.tsx`      | Scroll-spy for the active heading        |
-| `components/scroll-to-top.tsx`               | Scroll position listener                 |
-| `components/decorative/starfield.tsx`        | Canvas and animation frame               |
-| `components/decorative/star-field-mount.tsx` | Reduced-motion media query               |
-| `components/mdx/code-group.tsx`              | Tab selection state                      |
-| `layouts/list-layout-with-tags.tsx`          | Search filter state                      |
-| `components/search/command-menu.tsx`         | `cmdk` dialog and deferred local search  |
+| Component                                | Reason                                                 |
+| ---------------------------------------- | ------------------------------------------------------ |
+| `app/theme-providers.tsx`                | `next-themes` context                                  |
+| `components/layout/theme-switch.tsx`     | Reads and sets theme state                             |
+| `components/layout/active-nav-link.tsx`  | `usePathname` for the current-page indicator           |
+| `components/layout/mobile-nav.tsx`       | Sheet open state and lazy panel trigger                |
+| `components/layout/mobile-nav-panel.tsx` | Headless UI dialog and body scroll lock, loaded lazily |
+| `components/layout/search-button.tsx`    | Opens the command dialog through context               |
+| `components/SearchProvider.tsx`          | Keyboard shortcut, open state, focus restoration       |
+| `components/search/command-menu.tsx`     | `cmdk` dialog and deferred local search, loaded lazily |
+| `components/blog/comments.tsx`           | Click-to-load gate for the Giscus iframe               |
+| `components/blog/toc-scroll-spy.tsx`     | Scroll-spy for the active heading                      |
+| `components/blog/filtered-post-list.tsx` | Search filter state                                    |
+| `components/CodeBlock.tsx`               | Clipboard copy state                                   |
+| `components/mdx/code-group.tsx`          | Tab selection state                                    |
+| `components/ScrollTopAndComment.tsx`     | Scroll position listener                               |
 
-That is eleven, up from seven, for a site with roughly twice the surface area. `SINGULARITY-057` enforces the ceiling with an automated check that fails continuous integration if an unlisted file gains `'use client'`.
+That is fourteen, up from seven, for a site with roughly twice the surface area. `SINGULARITY-057` enforces the ceiling with an automated check that fails continuous integration if an unlisted file gains `'use client'`.
 
-The starfield deserves emphasis. It is mounted as a _sibling_ of `{children}` in the shell layout, never as a wrapper. A wrapper would force the entire page subtree to be client-rendered, which is the most common way this architecture gets destroyed by a well-meaning change.
+Three entries deserve a note, because they depart from the original eleven-file plan.
+
+`components/layout/active-nav-link.tsx` crosses the boundary that `SINGULARITY-023` warned about. No server-side approach exists in the App Router, because a layout cannot read the current pathname. The indicator was kept rather than omitted, because `aria-current="page"` is the only programmatic signal a screen-reader user gets for location. The cost is bounded: the component renders a single anchor and holds no other state.
+
+`components/layout/mobile-nav-panel.tsx` and `components/search/command-menu.tsx` exist so that Headless UI, `cmdk`, and MiniSearch load on first interaction instead of on first paint. Splitting each surface into a small trigger plus a lazily imported panel removed roughly 40 KB gzipped from every route's first load. Their parents remain client components; only the heavy dependency moved.
+
+The decorative starfield is no longer a client component at all. `SINGULARITY-005` measured the Canvas prototype over its frame budget, so `SINGULARITY-026` ships only the static SVG, which is a Server Component.
+
+The starfield still deserves emphasis as a structural rule. It is rendered as a _sibling_ of `{children}` in the shell layout, never as a wrapper. A wrapper would force the entire page subtree to be client-rendered, which is the most common way this architecture gets destroyed by a well-meaning change.
 
 ### Generation strategy
 
-Everything in the required site is statically generated at build time. There is no incremental static regeneration, no server-side rendering per request, and no client-side data fetching, because there is no dynamic data. If its spike passes, `/og/[...slug]` is the only dynamic exception and runs on the edge runtime with immutable cache headers. The degraded export profile omits that route and uses static social images.
+Everything in the required site is statically generated at build time. There is no incremental static regeneration, no server-side rendering per request, and no client-side data fetching, because there is no dynamic data. `/og/[...slug]` is prerendered too: it declares `dynamic = 'force-static'` with `generateStaticParams` over published posts and projects, so one card is emitted per slug at build time. That keeps the route working under the degraded export profile, which cannot host a dynamic or edge handler, and it lets the CDN serve the cards without invoking a function.
 
 `generateStaticParams` is already used correctly for blog posts, blog pagination, tags, and tag pagination. It is extended to `/projects/[slug]`.
 

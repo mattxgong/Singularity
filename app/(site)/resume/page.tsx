@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Section } from '@/components/ui/section'
 import { awards, education, experience, profile, siteMetadata, skillGroups } from '@/data/index'
 import { formatPeriod } from '@/lib/format'
+import { createPersonJsonLd } from '@/lib/seo'
 import { genPageMetadata } from 'app/seo'
 
 export const metadata = genPageMetadata({
@@ -12,28 +13,17 @@ export const metadata = genPageMetadata({
 })
 
 export default function ResumePage() {
-  const personJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
+  const personJsonLd = createPersonJsonLd({
     name: profile.name,
-    email: `mailto:${profile.email}`,
-    url: siteMetadata.siteUrl,
+    email: profile.email,
+    url: `${siteMetadata.siteUrl}/resume`,
     jobTitle: profile.status,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Waterloo',
-      addressRegion: 'Ontario',
-      addressCountry: 'CA',
-    },
-    alumniOf: education.map((entry) => ({
-      '@type': 'CollegeOrUniversity',
-      name: entry.institution,
-    })),
+    education: education.map((entry) => entry.institution),
     sameAs: [siteMetadata.github, siteMetadata.linkedin],
     knowsAbout: skillGroups.flatMap((group) =>
       group.skills.filter((skill) => skill.primary).map((skill) => skill.name)
     ),
-  }
+  })
 
   return (
     <>

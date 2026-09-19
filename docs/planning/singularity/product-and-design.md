@@ -305,7 +305,7 @@ Iconography is a single line-based set at a consistent stroke weight, imported p
 
 ### Motion
 
-Governed by D4. The ceiling is Canvas 2D.
+Governed by D4. The ceiling was Canvas 2D, and `SINGULARITY-005` measured it over budget, so the shipped decoration is static.
 
 The starfield is a single isolated client leaf component. It renders into a fixed, full-viewport `<canvas>` behind all content, with `aria-hidden="true"`, `pointer-events: none`, and a `z-index` below every interactive layer. It never wraps content, so it cannot force parent components to become client components. This is what protects the seven-file client boundary documented in [research.md](research.md).
 
@@ -339,7 +339,7 @@ Breakpoints follow Tailwind defaults. No custom breakpoints are introduced.
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Below 640px      | Single column. Static SVG starfield. Table of contents collapsed into a disclosure. Navigation in the existing mobile sheet. Project cards full width. |
 | 640px to 1024px  | Two-column project grid. Navigation still in the sheet. Starfield still static.                                                                        |
-| 1024px to 1280px | Full horizontal navigation. Canvas starfield enabled. Table of contents as a sticky sidebar. Three-column project grid.                                |
+| 1024px to 1280px | Full horizontal navigation. Table of contents as a sticky sidebar. Three-column project grid.                                                          |
 | Above 1280px     | Wide container engages. Experience timeline gains its date gutter. Measure stays capped at 68ch regardless of available width.                         |
 
 Mobile is the design target, not the fallback. J1 explicitly assumes a phone.
@@ -374,7 +374,7 @@ Contrast minimums are tabulated in the colour section. Interactive targets are a
 
 ### Progressive enhancement and fallbacks
 
-The site must be fully usable with JavaScript disabled. Every core route is statically rendered, so navigation, reading, project browsing, and the resume download all work without client JavaScript. What degrades: the theme switch falls back to the system preference, the kbar command palette is unavailable, the blog search filter is unavailable, Giscus comments do not load, and the Canvas starfield is replaced by static artwork.
+The site must be fully usable with JavaScript disabled. Every core route is statically rendered, so navigation, reading, project browsing, and the resume download all work without client JavaScript. What degrades: the theme switch falls back to the system preference, the command palette is unavailable, the blog search filter is unavailable, and Giscus comments do not load. The decorative artwork is static SVG and renders regardless.
 
 Canvas is treated as optional, not assumed. If `getContext('2d')` returns null, the static SVG fallback remains. There is no WebGL path at all, so no WebGL fallback is required, which is a direct benefit of D4.
 

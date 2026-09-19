@@ -1,12 +1,10 @@
 import { Metadata } from 'next'
 import { siteMetadata } from '@/data/index'
 
-interface PageSEOProps {
+interface PageSEOProps extends Omit<Metadata, 'title'> {
   title: string
   description?: string
   image?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
 }
 
 export function genPageMetadata({ title, description, image, ...rest }: PageSEOProps): Metadata {

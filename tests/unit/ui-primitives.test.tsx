@@ -43,6 +43,21 @@ describe('interface primitives', () => {
     expect(cn('px-2 text-sm', 'px-6')).toBe('text-sm px-6')
   })
 
+  it.each([
+    ['text-small', 'text-heading-3', 'text-heading-3'],
+    ['text-ink', 'text-accent', 'text-accent'],
+    ['py-rhythm-4', 'py-rhythm-8', 'py-rhythm-8'],
+    ['duration-fast', 'duration-slow', 'duration-slow'],
+    ['ease-standard', 'ease-exit', 'ease-exit'],
+    ['bg-surface', 'bg-surface-raised', 'bg-surface-raised'],
+  ])('resolves the %s and %s observatory scales to %s', (earlier, later, expected) => {
+    expect(cn(earlier, later)).toBe(expected)
+  })
+
+  it('keeps observatory font size and colour in different class groups', () => {
+    expect(cn('text-small', 'text-ink')).toBe('text-small text-ink')
+  })
+
   it('composes card regions without prop drilling', () => {
     render(
       <Card>

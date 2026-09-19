@@ -1,7 +1,10 @@
-import rss from './rss.mjs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 
-async function postbuild() {
-  await rss()
-}
+// Declares the generated ESM output as a module so Node does not reparse it on import.
+const generatedDir = new URL('../.content-collections/generated/', import.meta.url)
+mkdirSync(generatedDir, { recursive: true })
+writeFileSync(new URL('package.json', generatedDir), '{ "type": "module" }\n')
 
-postbuild()
+const { default: rss } = await import('./rss.mjs')
+
+await rss()

@@ -1,0 +1,99 @@
+---
+title: Designing Observable Multi-Agent Workflows
+date: '2026-09-18'
+tags: ['ai-agents', 'systems', 'tooling']
+draft: false
+summary: A practical architecture for coordinating specialized AI agents without losing control of state, evidence, or failure recovery.
+featured: true
+bibliography: references-data.bib
+---
+
+Multi-agent systems become difficult at the boundaries, not inside the individual agents. A planner can produce a sensible task list, and an implementer can write good code, yet the overall workflow can still fail because nobody owns state transitions, evidence, or recovery.
+
+The useful design question is therefore not “How many agents should I add?” It is “What must remain true as work moves between agents?” This article describes a generic architecture I use to answer that question. It contains no internal system details or proprietary tooling.
+
+## Start with an explicit state machine
+
+Treat orchestration as a state machine rather than a conversation. Each transition should name its required input, permitted output, validation rule, and failure destination.
+
+<Figure
+  src="/static/images/blog/observable-agent-workflow.svg"
+  alt="A workflow moving from intake through planning and execution to validation, with failed validation returning to execution"
+  caption="A small orchestration loop with an explicit recovery path."
+  width={1200}
+  height={560}
+/>
+
+This model keeps control flow outside agent prose. The orchestrator can reject an invalid transition even when an agent sounds confident.
+
+```ts title="workflow-state.ts"
+type WorkflowState =
+  | { status: 'intake'; request: string }
+  | { status: 'planned'; tasks: Task[] }
+  | { status: 'executing'; task: Task; evidence: Evidence[] }
+  | { status: 'validating'; evidence: Evidence[] }
+  | { status: 'complete'; evidence: Evidence[] }
+```
+
+<Callout kind="important" title="Keep authority narrow">
+  An agent may propose the next state, but the orchestrator owns whether that transition is valid.
+</Callout>
+
+## Make evidence part of the contract
+
+An agent result should carry evidence that another process can inspect. For coding work, that may include changed paths, test commands, exit codes, and a compact explanation of any unresolved risk.
+
+Suppose a task has $n$ required checks and $p_i$ is 1 when check $i$ passes. A deliberately strict completion score is
+
+$$
+C = \prod_{i=1}^{n} p_i.
+$$
+
+The product is unforgiving by design: one missing mandatory check keeps the task incomplete. Optional quality signals can be reported separately instead of weakening the completion rule.
+
+Evidence should also be bounded. Raw logs consume context and obscure the decision. Keep the complete log as an artifact, then return the few lines that establish the verdict.
+
+## Separate coordination from specialization
+
+The orchestrator should know workflow rules, not every domain. Specialized agents should know their domain, not global scheduling. This division produces three useful boundaries:
+
+1. The coordinator decomposes and routes work.
+2. The specialist performs one bounded operation.
+3. The validator checks artifacts against explicit criteria.
+
+When multiple agents can act on the same task, selection becomes a coordination problem. Game theory formalizes how independent actors respond to incentives and constraints [@Nash1950]. In practical orchestration, the lesson is modest: define ownership and success criteria explicitly so that local optimization does not quietly replace the workflow’s actual goal.
+
+## Design failure as a normal transition
+
+Retries should not mean “run the same prompt again.” A useful failure record distinguishes among transient tool failure, invalid output, missing context, and a task that is too broad.
+
+```ts title="recovery.ts"
+function recover(failure: Failure): Recovery {
+  if (failure.kind === 'transient') return { action: 'retry', limit: 1 }
+  if (failure.kind === 'invalid-output') return { action: 'repair', feedback: failure.errors }
+  if (failure.kind === 'missing-context') return { action: 'research', questions: failure.gaps }
+  return { action: 'split-task', task: failure.task }
+}
+```
+
+This gives the system a finite recovery vocabulary. It also makes repeated failure observable: if a task cycles through repair without changing evidence, escalation is more honest than another retry.
+
+## Preserve a compact audit trail
+
+The final artifact should explain what happened without replaying the entire conversation. A useful trail records:
+
+- the task and its owner;
+- the input revision or commit;
+- the files or systems changed;
+- the checks performed and their outcomes;
+- the reason for any manual override.
+
+This is enough to reproduce a decision, compare runs, and diagnose drift. It also makes human review faster because reviewers can inspect evidence rather than infer process from a polished summary.
+
+## The practical test
+
+A multi-agent workflow is ready when removing an agent does not make its responsibilities disappear. The state machine still names the missing transition, the contract still requires evidence, and the validator still refuses an incomplete result.
+
+That is the shift from a collection of capable prompts to an operable system: agents supply judgment, while explicit state, contracts, and evidence preserve control.
+
+## References
