@@ -1,6 +1,10 @@
 MIT License
 
+Copyright (c) 2026 Matthew Gong
+
+Portions of this software are derived from the Tailwind Next.js Starter Blog:
 Copyright (c) 2021-2025 Timothy Lin
+https://github.com/timlrx/tailwind-nextjs-starter-blog
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

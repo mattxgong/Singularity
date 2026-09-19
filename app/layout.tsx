@@ -5,7 +5,7 @@ import 'remark-github-blockquote-alert/alert.css'
 import localFont from 'next/font/local'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Analytics from '@/components/Analytics'
-import { siteMetadata } from '@/data/index'
+import { brand, siteMetadata } from '@/data/index'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 
@@ -92,17 +92,22 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const basePath = process.env.BASE_PATH || ''
+  // next-themes swaps this before paint when a reader has chosen otherwise.
+  // Rendering it server-side is what holds the default without JavaScript.
+  const defaultThemeClass = siteMetadata.theme === 'system' ? '' : siteMetadata.theme
 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${sourceSerif.variable} ${sourceSerifItalic.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${sourceSerif.variable} ${sourceSerifItalic.variable} ${inter.variable} ${jetbrainsMono.variable} ${defaultThemeClass}`}
       suppressHydrationWarning
     >
+      <link rel="icon" href={`${basePath}/static/favicons/favicon.ico`} sizes="16x16 32x32 48x48" />
       <link
-        rel="apple-touch-icon"
-        sizes="76x76"
-        href={`${basePath}/static/favicons/apple-touch-icon.png`}
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href={`${basePath}/static/favicons/favicon-16x16.png`}
       />
       <link
         rel="icon"
@@ -112,19 +117,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       />
       <link
         rel="icon"
-        type="image/png"
-        sizes="16x16"
-        href={`${basePath}/static/favicons/favicon-16x16.png`}
+        type="image/svg+xml"
+        href={`${basePath}/static/favicons/favicon.svg`}
+        sizes="any"
+      />
+      <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href={`${basePath}/static/favicons/apple-touch-icon.png`}
       />
       <link rel="manifest" href={`${basePath}/static/favicons/site.webmanifest`} />
       <link
         rel="mask-icon"
         href={`${basePath}/static/favicons/safari-pinned-tab.svg`}
-        color="#5bbad5"
+        color={brand.accent}
       />
-      <meta name="msapplication-TileColor" content="#000000" />
-      <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
-      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
+      <meta name="msapplication-TileColor" content={brand.tile} />
+      <meta
+        name="msapplication-TileImage"
+        content={`${basePath}/static/favicons/mstile-150x150.png`}
+      />
+      {/* Matches the default theme. ThemeSwitch retints it when the reader picks another. */}
+      <meta name="theme-color" content={brand.void} />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body className="pl-[calc(100vw-100%)] antialiased">
         <ThemeProviders>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { brand } from '@/data/index'
 import { cn } from '@/lib/cn'
 
 const iconClassName = 'h-5 w-5'
@@ -52,6 +53,15 @@ export default function ThemeSwitch() {
   const { theme, setTheme, resolvedTheme } = useTheme()
 
   useEffect(() => setMounted(true), [])
+
+  // The document ships a static theme-color for the default theme, so it needs
+  // updating whenever the reader resolves to the other one.
+  useEffect(() => {
+    if (!resolvedTheme) return
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', resolvedTheme === 'dark' ? brand.void : brand.plate)
+  }, [resolvedTheme])
 
   return (
     <Menu as="div" className="relative">

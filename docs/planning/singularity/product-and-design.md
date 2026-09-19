@@ -327,7 +327,9 @@ Interface motion beyond the starfield is CSS-only: transitions on colour, opacit
 
 The existing `next-themes` setup in [app/theme-providers.tsx](../../../app/theme-providers.tsx) is retained unchanged, including `suppressHydrationWarning` on the `html` element and the `.dark` class variant already declared in [css/tailwind.css](../../../css/tailwind.css).
 
-The default resolves to system preference, which is the current behaviour. The `<meta name="theme-color">` pair already present in [app/layout.tsx](../../../app/layout.tsx) is updated to the new void and plate values.
+The default is dark. An observatory is read in the dark by necessity, and the void surface is the form the identity was designed in: the favicon, the app icons, and the manifest splash are all drawn on it. A reader arriving with a light system preference still gets the site as designed, and the three-state control lets them move to the plate surface or hand the choice back to the operating system.
+
+This has one consequence worth stating. Because the page surface no longer tracks `prefers-color-scheme`, a media-query pair on `<meta name="theme-color">` would leave a reader with a light system preference looking at a void page behind light browser chrome. [app/layout.tsx](../../../app/layout.tsx) therefore declares a single theme colour matching the default, and the theme switch retints it from `resolvedTheme` once mounted. Without JavaScript, the declared value and the rendered surface still agree, because both are the default.
 
 `Recommendation`: keep the three-state control, light, dark, and system, rather than a two-state toggle. The Headless UI implementation in [components/ThemeSwitch.tsx](../../../components/ThemeSwitch.tsx) already does this correctly and is accessible as written.
 
@@ -374,7 +376,7 @@ Contrast minimums are tabulated in the colour section. Interactive targets are a
 
 ### Progressive enhancement and fallbacks
 
-The site must be fully usable with JavaScript disabled. Every core route is statically rendered, so navigation, reading, project browsing, and the resume download all work without client JavaScript. What degrades: the theme switch falls back to the system preference, the command palette is unavailable, the blog search filter is unavailable, and Giscus comments do not load. The decorative artwork is static SVG and renders regardless.
+The site must be fully usable with JavaScript disabled. Every core route is statically rendered, so navigation, reading, project browsing, and the resume download all work without client JavaScript. What degrades: the theme switch is unavailable and the page holds the default theme, the command palette is unavailable, the blog search filter is unavailable, and Giscus comments do not load. The decorative artwork is static SVG and renders regardless.
 
 Canvas is treated as optional, not assumed. If `getContext('2d')` returns null, the static SVG fallback remains. There is no WebGL path at all, so no WebGL fallback is required, which is a direct benefit of D4.
 

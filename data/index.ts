@@ -1,5 +1,6 @@
 export { default as navigation } from './navigation'
 export type { NavigationItem } from './navigation'
+export { default as brand } from './brand'
 export { awards, education } from './education'
 export { default as experience } from './experience'
 export { default as profile } from './profile'

@@ -2835,6 +2835,30 @@ yarn serve
 
 Then inspect the browser tab, install as a progressive web application, and validate the manifest.
 
+Implementation evidence, 2026-09-19.
+
+- The mark is a gravitational lens: a broken photon ring around the event horizon, two lensed arcs of a background source on opposite sides, and the unlensed source outside the deflection field. It names the site rather than merely decorating it.
+- [scripts/generate-identity-assets.mjs](../../../scripts/generate-identity-assets.mjs) is the single source of truth for the geometry and rasterizes every artifact through the Playwright Chromium already present as a development dependency. Run it with `yarn identity`. The `.ico` container is assembled from PNG payloads in the same script, so the whole set is reproducible rather than hand-drawn.
+- The mark is drawn at three optical sizes rather than scaled from one master. The lensed arcs merge into the ring below roughly 24 pixels, so the 16 pixel tier keeps only the broken ring and the source. Round line caps were replaced with butt caps at that tier because a cap on a band that wide closes the gap it is meant to leave open.
+- Colours resolve from the OKLCH tokens: the tile is `--color-void-900`, the horizon `--color-void-950`, the ring `--color-starlight-200`, the arcs `--color-starlight-400`, and the source `--color-plate-50`.
+- [data/brand.ts](../../../data/brand.ts) holds those tokens as sRGB hex, because browser chrome, the manifest, and `next/og` all run outside the cascade and cannot read a custom property. [app/layout.tsx](../../../app/layout.tsx) and the Open Graph route both consume it, which removes the ad-hoc hex values the route previously carried.
+- The manifest gained a name, a short name, a description, a start URL, a scope, 192 and 512 pixel icons, and a 512 pixel maskable variant. Icon paths are relative to the manifest, so they survive `BASE_PATH`. The previous file declared one icon at a path that returned 404.
+- The header mark in [data/logo.svg](../../../data/logo.svg) uses `currentColor` for the ring and arcs and `var(--color-accent)` for the source, so it retints with the theme without a second asset. Its viewBox is cropped to the artwork, since an inline logo has no tile to breathe against.
+- Verified against a running server: every declared icon resolves with status 200, the manifest serves as `application/manifest+json`, and the emitted tags carry `#fcfaf4`, `#02060f`, `#08121f`, and `#004e69` rather than the starter defaults.
+
+Correction, 2026-09-19. The visual gate could not see the logo replacement.
+
+- `maxDiffPixelRatio: 0.005` in [playwright.config.ts](../../../playwright.config.ts) tolerates roughly 1,250 differing pixels on the 375 by 667 J1 clip, which exceeds the entire 32 pixel mark. The suite therefore passed against a baseline still depicting the starter logo.
+- Because Playwright defaults `--update-snapshots` to `changed`, and nothing registered as changed, `yarn test:visual:update` rewrote nothing. The baseline was refreshed with `--update-snapshots=all`. Only the J1 baseline moved, which confirms the other three regions exclude the header.
+- The tolerance is worth revisiting: a gate that cannot detect a complete logo swap is not guarding identity.
+
+Out of scope, recorded here rather than fixed.
+
+- `public/static/favicons/browserconfig.xml` is matched by the `/public/**/*.xml` rule in `.gitignore`, so it is untracked and never deploys. Its local copy was corrected, but the `msapplication` meta tags in [app/layout.tsx](../../../app/layout.tsx) are what actually ship.
+- The `--color-primary-*` aliases in [css/tailwind.css](../../../css/tailwind.css) now have no consumers anywhere in the repository. `SINGULARITY-009` introduced them as a deliberate compatibility shim; they can be retired.
+- The component layer carries no starter styling. A sweep for hardcoded hex values, `rgb()` calls, and default Tailwind colour scales across `app/`, `components/`, `layouts/`, `css/`, and `data/` returned nothing outside [data/brand.ts](../../../data/brand.ts).
+- The customization section of [README.md](../../../README.md) is still upstream boilerplate and references files this repository no longer has, among them `data/siteMetadata.js`, `data/projectsData.js`, `data/headerNavLinks.js`, `tailwind.config.js`, `contentlayer.config.ts`, and `components/MDXComponents.js`.
+
 Risks and rollback. Rollback: restore the previous asset set.
 
 ### SINGULARITY-064 Sitemap, robots, and feed coverage

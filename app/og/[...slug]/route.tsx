@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { allBlogs } from 'content-collections'
-import { projects } from '@/data/index'
+import { brand, projects } from '@/data/index'
 
 // Prerendered so the card survives the degraded static-export profile.
 export const dynamic = 'force-static'
@@ -47,8 +47,8 @@ export async function GET(_request: Request, context: RouteContext) {
   return new ImageResponse(
     <div
       style={{
-        background: '#faf8f3',
-        color: '#141a26',
+        background: brand.plate,
+        color: brand.void,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -57,7 +57,15 @@ export async function GET(_request: Request, context: RouteContext) {
         width: '100%',
       }}
     >
-      <div style={{ color: '#10566b', display: 'flex', fontSize: 28, textTransform: 'uppercase' }}>
+      <div
+        style={{
+          color: brand.accent,
+          display: 'flex',
+          fontSize: 28,
+          letterSpacing: 3,
+          textTransform: 'uppercase',
+        }}
+      >
         {card.label}
       </div>
       <div
@@ -74,15 +82,15 @@ export async function GET(_request: Request, context: RouteContext) {
       <div
         style={{
           alignItems: 'center',
-          borderTop: '2px solid #6b7385',
+          borderTop: `2px solid ${brand.rule}`,
           display: 'flex',
           fontSize: 30,
           justifyContent: 'space-between',
           paddingTop: 28,
         }}
       >
-        <span>Matthew Gong</span>
-        <span style={{ color: '#10566b' }}>Singularity</span>
+        <span style={{ color: brand.inkMuted }}>Matthew Gong</span>
+        <span style={{ color: brand.accent }}>Singularity</span>
       </div>
     </div>,
     {

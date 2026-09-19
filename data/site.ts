@@ -53,7 +53,7 @@ const siteMetadata: SiteConfig = {
   description: "Matthew Gong's personal portfolio and technical blog",
   language: 'en-us',
   locale: 'en-US',
-  theme: 'system',
+  theme: 'dark',
   siteUrl: 'https://mattxgong-singularity.vercel.app',
   siteRepo: 'https://github.com/mattxgong/Singularity',
   siteLogo: `${basePath}/static/images/logo.png`,
