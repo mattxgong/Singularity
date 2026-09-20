@@ -35,7 +35,7 @@ export default function ResumePage() {
       <header className="py-rhythm-7 sm:py-rhythm-8 gap-rhythm-5 flex flex-col items-start sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-rhythm-3 max-w-[68ch]">
           <p className="text-small text-accent font-sans font-semibold uppercase">Resume</p>
-          <h1 className="text-heading-1 font-sans font-bold">{profile.name}</h1>
+          <h1 className="text-heading-1 font-title">{profile.name}</h1>
           <p className="text-lead text-ink-muted font-serif">{profile.positioning}</p>
           <a
             className="text-accent font-sans underline underline-offset-4"

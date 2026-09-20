@@ -177,7 +177,7 @@ Every meaningful capability in the current repository, classified. `retain` mean
 | `MDXComponents`                           | replace | Move to a first-party map for the selected engine; remove Pliny and `BlogNewsletterForm`, then add callouts, figures, and code groups.                                                      |
 | `TableWrapper`, `PageTitle`, social icons | retain  | Small and correct.                                                                                                                                                                          |
 | Design-system primitives                  | add     | No `Button`, `Badge`, `Prose`, or `Card` primitive exists. Everything is ad-hoc Tailwind.                                                                                                   |
-| Starfield component                       | add     | D4. Static SVG, Server Component, no animation after the SINGULARITY-005 measurement.                                                                                                       |
+| Starfield component                       | add     | D4. Layered SVG, Server Component, drifting on the compositor after the SINGULARITY-005 measurement ruled out main-thread animation.                                                        |
 
 ### Content and data
 
@@ -278,6 +278,20 @@ This is the most useful reference in the set, for the opposite of the usual reas
 
 `Recommendation`: adopt the accessibility practices wholesale. Adopt none of the asset strategy. The 97 MB video and the 64 performance score are the direct evidence behind D4.
 
+#### Mif2006/Space-Portolio
+
+Reviewed on 2026-09-19, at the repository head, commit `9213a05e3f71624aa54cb730bb0218c79bdeb62f`, "remove scrollbar". Added late, as a targeted study of one question: how the most-forked space-themed Next.js portfolio builds its background.
+
+Stack: Next.js 13.5, React 18, Tailwind v3, `@react-three/fiber`, `@react-three/drei`, `maath`, `three` 0.157, Framer Motion.
+
+The background is `components/main/StarBackground.tsx`. It distributes 5,000 points through `maath`'s `inSphere` into a `Float32Array`, renders them as a drei `<Points>` cloud, and mutates the group's `rotation.x` and `rotation.y` inside a `useFrame` callback on every frame. The canvas mounts in the root layout as `fixed inset-0 z-[20]` over a `#030014` body.
+
+Three observations matter.
+
+The dependency set costs roughly 160 to 200 KB gzipped of client JavaScript and forces a `'use client'` boundary at the root layout, which alone disqualifies it under D4 and the client-boundary ceiling in [architecture.md](architecture.md). The rotation runs on the main thread, which is exactly the cost profile `SINGULARITY-005` measured and rejected. The canvas also sits above page content at `z-[20]` with no `pointer-events: none`, and two props are misspelled, `color="$fff"` and `dethWrite`, so neither takes effect.
+
+`Recommendation`: reject the implementation, adopt the composition. The visual idea worth taking is depth through differential speed: nearer stars move faster than distant ones. That reads as parallax without any three-dimensional geometry, and CSS `transform` delivers it on the compositor for zero JavaScript. This is the evidence behind the 2026-09-19 amendment to D4.
+
 ## Feature and user-experience matrix
 
 How each reference's notable features map onto Singularity. "Fit" is the judgement, with the reason.
@@ -299,8 +313,8 @@ How each reference's notable features map onto Singularity. "Fit" is the judgeme
 | Comment system                      | Yes, custom with a database |           Yes, Giscus           |          No          |      No       | Adopt Giscus. A custom system needs a database, which is out of scope.                  |
 | Post view counts and likes          |             Yes             |               No                |          No          |      No       | Reject per D15. Requires a database.                                                    |
 | Internationalization                |             Yes             |               No                |          No          |      No       | Reject per D10.                                                                         |
-| Motion library                      |         Yes, Motion         |             Minimal             | Yes, Motion and GSAP |   Yes, GSAP   | Reject for v1. CSS transitions and the Canvas starfield cover the need.                 |
-| WebGL or 3D                         |             No              |               No                |     Yes, shaders     | Yes, Three.js | Reject per D4. The Portfolio reference quantifies the cost.                             |
+| Motion library                      |         Yes, Motion         |             Minimal             | Yes, Motion and GSAP |   Yes, GSAP   | Reject for v1. CSS transitions and the compositor-driven starfield cover the need.      |
+| WebGL or 3D                         |             No              |               No                |     Yes, shaders     | Yes, Three.js | Reject per D4. Portfolio quantifies the cost; Space-Portolio shows the dependency cost. |
 | Video backgrounds                   |             No              |               No                |          No          |      Yes      | Reject. 97 MB of media is indefensible.                                                 |
 | Live third-party status widgets     |             No              | Yes, WakaTime, Spotify, Discord |          No          |  Yes, GitHub  | Defer. Every widget is a third-party request, a privacy disclosure, and a failure mode. |
 | Contact form                        |             Yes             |               No                |         Yes          | Yes, EmailJS  | Reject for v1 per D7.                                                                   |

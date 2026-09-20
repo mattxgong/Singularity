@@ -37,8 +37,8 @@ export default function Footer() {
 
       <div className="mt-rhythm-6 gap-rhythm-3 border-boundary/25 pt-rhythm-5 grid border-t md:grid-cols-2">
         <p>
-          Set in Source Serif 4, Inter, and JetBrains Mono, each licensed under the SIL Open Font
-          License 1.1.
+          Set in Source Serif 4, IBM Plex Sans, and JetBrains Mono, each licensed under the SIL Open
+          Font License 1.1. Titles set in Sterion by Lithochray Studio.
         </p>
         <p className="md:text-right">
           © {new Date().getFullYear()} {siteMetadata.author}. Built from the{' '}

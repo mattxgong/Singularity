@@ -12,7 +12,7 @@ export function Hero({ profile }: HeroProps) {
         <p className="text-small text-accent mb-rhythm-4 font-sans font-semibold uppercase">
           {profile.status}
         </p>
-        <h1 className="text-display text-ink font-sans font-bold">{profile.name}</h1>
+        <h1 className="text-display text-ink font-title">{profile.name}</h1>
         <p className="text-lead text-ink-muted mt-rhythm-5 max-w-[62ch] font-serif">
           {profile.positioning}
         </p>

@@ -72,19 +72,21 @@ The consolidated layout takes a `variant` derived from the existing `layout` fro
 
 Reversal trigger: if the variants diverge enough that the single component develops more than two conditional branches, split it again.
 
-### A5: Starfield as a static server-rendered layer
+### A5: Starfield as a server-rendered layer with compositor-only motion
 
-Chosen: an inline SVG rendered by a Server Component, placed once in the site shell layout, positioned fixed behind all content.
+Chosen: inline SVG rendered by a Server Component, placed once in the site shell layout, positioned fixed behind all content. Five tiled star layers drift through a CSS `transform` animation that the browser runs on the compositor, producing parallax from differential speed rather than from geometry. Two of them also pulse through `opacity`, the other property the compositor owns.
 
-Rejected: a `<canvas>` client component, a client component wrapping page content, and a CSS-only animated background.
+Rejected: a `<canvas>` client component, a client component wrapping page content, and any WebGL or Three.js scene.
 
 The wrapper approach is rejected because it would convert the entire subtree into client components, destroying the seven-file client boundary documented in [research.md](research.md). This is the single most important architectural constraint in the project.
 
 Canvas 2D was the original choice and remained so through the design phase. `SINGULARITY-005` then measured it: the single-canvas prototype held roughly 1.06 milliseconds mean draw at 4 times throttling, but at 6 times it reached 1.82 milliseconds mean and produced an 81 millisecond long task, and a five-minute run reached 5.29 milliseconds mean with forty long tasks. That fails both the 2 millisecond frame budget and the 50 millisecond long-task threshold, so the reversal trigger fired and the Canvas module was withdrawn.
 
-The shipped layer is therefore the static SVG that was always the designated fallback: a coordinate grid, a scattered star pattern, and an instrument reticle, drawn with the theme's semantic colour tokens so it follows both themes without JavaScript. It costs zero kilobytes of client script, needs no reduced-motion branch, and renders identically on every viewport.
+The shipped layer is therefore the SVG that was always the designated fallback: a nebula wash, five tiled star layers, a coordinate grid, and an instrument reticle, drawn with the theme's semantic colour tokens so it follows both themes without JavaScript. It costs zero kilobytes of client script and renders identically on every viewport.
 
-Reversal trigger: reintroducing motion requires a fresh measurement that clears the 2 millisecond frame budget and the long-task threshold at 6 times throttling, recorded against an amended `SINGULARITY-005`.
+The 2026-09-19 amendment restored depth without restoring cost. The star layers drift at different speeds through a CSS `transform` animation, and two of them pulse through `opacity`. The browser runs both properties on the compositor rather than the main thread, so the frame budget `SINGULARITY-005` measured is untouched. The keyframes sit inside a `prefers-reduced-motion: no-preference` query, so the animation is never created for a reader who asks for stillness.
+
+Reversal trigger: reintroducing main-thread motion requires a fresh measurement that clears the 2 millisecond frame budget and the long-task threshold at 6 times throttling, recorded against an amended `SINGULARITY-005`. Reversing the drift alone requires only deleting one keyframe block.
 
 ### A6: Projects as typed data plus optional MDX
 
@@ -206,7 +208,7 @@ singularity/
 │   │   ├── tag.tsx                         [moved]    From components/Tag.tsx.
 │   │   └── comments.tsx                    [moved]    From components/Comments.tsx. Client.
 │   ├── decorative/                         [new]
-│   │   └── starfield-static.tsx            [new]      SVG artwork. Server component. aria-hidden.
+│   │   └── starfield.tsx                   [new]      Layered SVG. Server component. aria-hidden.
 │   ├── mdx/                                [new]
 │   │   ├── mdx-components.tsx              [moved]    From components/MDXComponents.tsx.
 │   │   ├── figure.tsx                      [new]      Image plus caption plus dual-theme source.
@@ -357,7 +359,7 @@ Three entries deserve a note, because they depart from the original eleven-file 
 
 `components/layout/mobile-nav-panel.tsx` and `components/search/command-menu.tsx` exist so that Headless UI, `cmdk`, and MiniSearch load on first interaction instead of on first paint. Splitting each surface into a small trigger plus a lazily imported panel removed roughly 40 KB gzipped from every route's first load. Their parents remain client components; only the heavy dependency moved.
 
-The decorative starfield is no longer a client component at all. `SINGULARITY-005` measured the Canvas prototype over its frame budget, so `SINGULARITY-026` ships only the static SVG, which is a Server Component.
+The decorative starfield is no longer a client component at all. `SINGULARITY-005` measured the Canvas prototype over its frame budget, so `SINGULARITY-026` ships a Server Component whose only motion is CSS animation of `transform` and `opacity`, both of which the compositor owns.
 
 The starfield still deserves emphasis as a structural rule. It is rendered as a _sibling_ of `{children}` in the shell layout, never as a wrapper. A wrapper would force the entire page subtree to be client-rendered, which is the most common way this architecture gets destroyed by a well-meaning change.
 

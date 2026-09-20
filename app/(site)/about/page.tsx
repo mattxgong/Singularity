@@ -25,7 +25,7 @@ export default function Page() {
       />
       <header className="py-rhythm-7 sm:py-rhythm-8 space-y-rhythm-4 max-w-[68ch]">
         <p className="text-small text-accent font-sans font-semibold uppercase">About</p>
-        <h1 className="text-heading-1 font-sans font-bold">Building useful systems</h1>
+        <h1 className="text-heading-1 font-title">Building Agentic Systems</h1>
         {profile.biography.map((paragraph) => (
           <p key={paragraph} className="text-lead text-ink-muted font-serif">
             {paragraph}

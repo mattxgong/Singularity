@@ -1,6 +1,6 @@
 import Footer from '@/components/layout/footer'
 import Header from '@/components/layout/header'
-import { StarfieldStatic } from '@/components/decorative/starfield-static'
+import { Starfield } from '@/components/decorative/starfield'
 import { SkipLink } from '@/components/layout/skip-link'
 import SearchProvider from '@/components/SearchProvider'
 import { Container } from '@/components/ui/container'
@@ -21,7 +21,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
       <SkipLink />
-      <StarfieldStatic />
+      <Starfield />
       <div className="relative z-10">
         <Container>
           <SearchProvider>

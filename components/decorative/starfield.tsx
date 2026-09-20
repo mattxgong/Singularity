@@ -13,6 +13,9 @@ type StarLayer = {
   // Drift translates by exactly one tile, so the loop is seamless.
   tile: { width: number; height: number }
   duration: string
+  // The pulse runs on the whole layer. Animating circles inside the SVG pattern
+  // would force the tile to re-rasterize every frame.
+  twinkle?: { duration: string; delay: string }
   stars: Star[]
 }
 
@@ -59,9 +62,34 @@ const starLayers: StarLayer[] = [
       { cx: 389, cy: 198, r: 1.2, fill: muted, opacity: 0.6 },
     ],
   },
+  {
+    id: 'starfield-twinkle-slow',
+    tile: { width: 340, height: 270 },
+    duration: '460s',
+    twinkle: { duration: '11s', delay: '-3.5s' },
+    stars: [
+      { cx: 47, cy: 208, r: 0.85, fill: accent, opacity: 0.5 },
+      { cx: 154, cy: 71, r: 0.7, fill: muted, opacity: 0.44 },
+      { cx: 268, cy: 163, r: 0.95, fill: accent, opacity: 0.52 },
+      { cx: 311, cy: 29, r: 0.7, fill: muted, opacity: 0.4 },
+      { cx: 96, cy: 129, r: 0.8, fill: muted, opacity: 0.46 },
+    ],
+  },
+  {
+    id: 'starfield-twinkle-fast',
+    tile: { width: 480, height: 390 },
+    duration: '300s',
+    twinkle: { duration: '7s', delay: '-1.2s' },
+    stars: [
+      { cx: 121, cy: 57, r: 1.2, fill: accent, opacity: 0.6 },
+      { cx: 366, cy: 214, r: 1.05, fill: muted, opacity: 0.54 },
+      { cx: 244, cy: 341, r: 1.3, fill: accent, opacity: 0.58 },
+      { cx: 431, cy: 118, r: 0.95, fill: muted, opacity: 0.5 },
+    ],
+  },
 ]
 
-export function StarfieldStatic() {
+export function Starfield() {
   return (
     <div aria-hidden="true" className="starfield">
       <div className="starfield-nebula" />
@@ -69,12 +97,14 @@ export function StarfieldStatic() {
       {starLayers.map((layer) => (
         <div
           key={layer.id}
-          className="starfield-layer"
+          className={layer.twinkle ? 'starfield-layer starfield-layer--twinkle' : 'starfield-layer'}
           style={
             {
               '--starfield-tile-x': `${layer.tile.width}px`,
               '--starfield-tile-y': `${layer.tile.height}px`,
               '--starfield-duration': layer.duration,
+              '--starfield-twinkle-duration': layer.twinkle?.duration,
+              '--starfield-twinkle-delay': layer.twinkle?.delay,
             } as CSSProperties
           }
         >

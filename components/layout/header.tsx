@@ -21,7 +21,7 @@ export default function Header() {
         className="focus-visible:outline-focus gap-rhythm-3 flex min-h-6 items-center focus-visible:outline-2 focus-visible:outline-offset-4"
       >
         <Logo className="h-8 w-8" aria-hidden="true" />
-        <span className="text-heading-3 text-ink hidden font-sans font-semibold sm:inline">
+        <span className="text-heading-3 text-ink font-title hidden sm:inline">
           {siteMetadata.headerTitle}
         </span>
       </Link>

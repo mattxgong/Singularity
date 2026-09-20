@@ -22,7 +22,7 @@ This planning set is the single source of truth for the transformation.
 
 Phases P0 through P5 are implemented. `SINGULARITY-001` captured the baseline, `SINGULARITY-002` selected Content Collections, `SINGULARITY-003` replaced Contentlayer2, and `SINGULARITY-069` replaced Pliny with focused first-party components and maintained packages. The design foundations, application shell, portfolio surfaces, blog experience, and all five optional integrations followed. Phase P6 implementation is complete: unit, journey, accessibility, client-boundary, content-integrity, image, Lighthouse, security-policy, and continuous integration gates are in place. Phase P7 has not started.
 
-A remediation pass on 2026-09-19 reviewed P0 through P5 against this planning set and closed the gaps it found. The degraded static-export build had regressed, because `SINGULARITY-048` shipped `/og/[...slug]` as an edge route; that route is now prerendered and both build profiles pass. `SINGULARITY-026` had shipped the Canvas starfield in contradiction of the `SINGULARITY-005` verdict and is now the static layer the measurement called for. The post layout and the tags index, both of which had been left on starter markup, are on the design system. Per-task corrections are recorded in [tasks.md](tasks.md), and [architecture.md](architecture.md) now lists the client components that actually exist.
+A remediation pass on 2026-09-19 reviewed P0 through P5 against this planning set and closed the gaps it found. The degraded static-export build had regressed, because `SINGULARITY-048` shipped `/og/[...slug]` as an edge route; that route is now prerendered and both build profiles pass. `SINGULARITY-026` had shipped the Canvas starfield in contradiction of the `SINGULARITY-005` verdict and was reduced to the layer the measurement called for, then amended later the same day to drift on the compositor, which that verdict does not govern. The post layout and the tags index, both of which had been left on starter markup, are on the design system. Per-task corrections are recorded in [tasks.md](tasks.md), and [architecture.md](architecture.md) now lists the client components that actually exist.
 
 External gates remain owner- or platform-dependent: the deferred Vercel preview check inherited from P0, the first continuous integration pull-request run, deployed Content Security Policy verification, and social-preview and Rich Results validation against a real deployment.
 
@@ -54,7 +54,7 @@ The plan preserves the content contract and server-rendering architecture while 
 4. New portfolio surfaces: a home page that leads with identity, project detail pages, a resume page, and a `/uses` page.
 5. The quality floor the starter lacks entirely: TypeScript strict mode, unit and end-to-end tests, accessibility assertions, performance budgets, and continuous integration.
 
-Decorative motion is deliberately constrained. A Canvas 2D starfield was the ceiling for v1, and it did not clear its measured budget, so the shipped decoration is static artwork. WebGL, Three.js, and video backgrounds were always out of scope, because one of the studied reference projects demonstrates precisely where that path leads: a Lighthouse performance score of 64.
+Decorative motion is deliberately constrained. A Canvas 2D starfield was the ceiling for v1, and it did not clear its measured budget, so the shipped decoration runs entirely on the compositor: a layered SVG animating nothing but `transform` and `opacity`, costing zero kilobytes of JavaScript and zero main-thread time per frame. WebGL, Three.js, and video backgrounds were always out of scope, because two of the studied reference projects demonstrate precisely where that path leads: a Lighthouse performance score of 64 in one, and roughly 200 KB gzipped of rendering dependencies in the other.
 
 ## Goals
 
@@ -71,20 +71,20 @@ Singularity succeeds if it does four jobs well.
 
 These are the acceptance thresholds referenced throughout [tasks.md](tasks.md). They are commitments, not aspirations.
 
-| Metric                                            | Target                                        | Measured by                                               |
-| ------------------------------------------------- | --------------------------------------------- | --------------------------------------------------------- |
-| Lighthouse Performance, mobile, home page         | >= 95                                         | Lighthouse CI, throttled mobile preset                    |
-| Lighthouse Accessibility, all routes              | 100                                           | Lighthouse CI plus Playwright axe assertions              |
-| Largest Contentful Paint, home, mobile            | < 1.8s                                        | Lighthouse CI                                             |
-| Total Blocking Time, representative routes        | < 200ms                                       | Lighthouse CI, median of three mobile runs                |
-| Interaction to Next Paint, 75th percentile        | < 200ms                                       | Vercel Speed Insights after sufficient production traffic |
-| Cumulative Layout Shift                           | < 0.05                                        | Lighthouse CI                                             |
-| First-load JavaScript, home route                 | <= 110 KB gzipped                             | `yarn analyze`                                            |
-| First-load JavaScript, blog post route            | <= 130 KB gzipped                             | `yarn analyze`                                            |
-| Total starfield cost                              | 0 KB gzipped; the shipped layer is static SVG | Bundle analyzer, manual check                             |
-| Axe violations, serious or critical               | 0                                             | Playwright plus `@axe-core/playwright`                    |
-| TypeScript errors under `strict: true`            | 0                                             | `yarn typecheck`                                          |
-| Keyboard-only completion of every primary journey | 100%                                          | Manual checklist in [roadmap.md](roadmap.md)              |
+| Metric                                            | Target                                 | Measured by                                               |
+| ------------------------------------------------- | -------------------------------------- | --------------------------------------------------------- |
+| Lighthouse Performance, mobile, home page         | >= 95                                  | Lighthouse CI, throttled mobile preset                    |
+| Lighthouse Accessibility, all routes              | 100                                    | Lighthouse CI plus Playwright axe assertions              |
+| Largest Contentful Paint, home, mobile            | < 1.8s                                 | Lighthouse CI                                             |
+| Total Blocking Time, representative routes        | < 200ms                                | Lighthouse CI, median of three mobile runs                |
+| Interaction to Next Paint, 75th percentile        | < 200ms                                | Vercel Speed Insights after sufficient production traffic |
+| Cumulative Layout Shift                           | < 0.05                                 | Lighthouse CI                                             |
+| First-load JavaScript, home route                 | <= 110 KB gzipped                      | `yarn analyze`                                            |
+| First-load JavaScript, blog post route            | <= 130 KB gzipped                      | `yarn analyze`                                            |
+| Total starfield cost                              | 0 KB gzipped; no main-thread animation | Bundle analyzer, manual check                             |
+| Axe violations, serious or critical               | 0                                      | Playwright plus `@axe-core/playwright`                    |
+| TypeScript errors under `strict: true`            | 0                                      | `yarn typecheck`                                          |
+| Keyboard-only completion of every primary journey | 100%                                   | Manual checklist in [roadmap.md](roadmap.md)              |
 
 ## Scope
 
@@ -104,11 +104,11 @@ These are the acceptance thresholds referenced throughout [tasks.md](tasks.md). 
 
 The classification controls launch decisions across the planning set.
 
-| Class       | Meaning                                                | Capabilities                                                                                                                                                                                                          |
-| ----------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Required    | Must pass before launch                                | Contentlayer and Pliny migration, rebranding, typed portfolio data, home, projects, about, resume, blog, tags, feeds, accessibility, privacy checks, quality scripts, continuous integration, static fallback artwork |
-| Conditional | Ships only after its P0 spike passes the stated budget | Dynamic Open Graph images. The Canvas starfield failed its spike and was withdrawn in favour of the static artwork                                                                                                    |
-| Optional    | May be withdrawn without delaying launch               | `/uses`, configured Giscus and Umami, project search indexing beyond posts, expanded JSON-LD beyond existing blog markup                                                                                              |
+| Class       | Meaning                                                | Capabilities                                                                                                                                                                                                     |
+| ----------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Required    | Must pass before launch                                | Contentlayer and Pliny migration, rebranding, typed portfolio data, home, projects, about, resume, blog, tags, feeds, accessibility, privacy checks, quality scripts, continuous integration, decorative artwork |
+| Conditional | Ships only after its P0 spike passes the stated budget | Dynamic Open Graph images. The Canvas starfield failed its spike and was withdrawn in favour of a compositor-driven layer                                                                                        |
+| Optional    | May be withdrawn without delaying launch               | `/uses`, configured Giscus and Umami, project search indexing beyond posts, expanded JSON-LD beyond existing blog markup                                                                                         |
 
 Conditional and optional capabilities must preserve a tested core experience when absent. A task cannot become a launch dependency merely because it appears in the target file tree.
 
@@ -133,7 +133,7 @@ These decisions form the proposed implementation baseline. Owner confirmation is
 | D1  | Deploy to Vercel on the Node runtime. Retain the static export path as a documented fallback only.                                                                 |
 | D2  | The subject is Matthew Gong, University of Waterloo Computing and Financial Management, class of 2027. Sourced from `ResumeLatex3.pdf`.                            |
 | D3  | Real portfolio content exists and is seeded from the resume. Content entry is a distinct phase from build work.                                                    |
-| D4  | Motion ceiling was Canvas 2D. `SINGULARITY-005` measured it over budget, so v1 ships the static SVG on every viewport.                                             |
+| D4  | Motion ceiling is compositor-only CSS. `SINGULARITY-005` measured Canvas 2D over budget, so v1 animates `transform` and nothing else.                              |
 | D5  | Before P1, the owner selects Content Collections or Velite and the team removes Contentlayer2. Content Collections is recommended, but not selected automatically. |
 | D6  | Remove Pliny. Use `cmdk` plus MiniSearch for local search, official `@giscus/react`, direct Umami integration, and focused first-party helpers. Remove newsletter. |
 | D7  | Contact is an accessible `mailto:` link plus social links. The address is intentionally public; no form ships in v1.                                               |
@@ -171,7 +171,7 @@ Validated first, in phase P0, before any substantial visual or content work. See
 
 1. At least one owner-approved engine preserves Singularity's schema, MDX, derived fields, artifacts, watch mode, clean builds, degraded export, and Vercel deployment. Content Collections is recommended; Velite is the approved alternative.
 2. Focused replacements can preserve every Pliny-owned behavior without expanding client JavaScript or introducing another umbrella dependency.
-3. A Canvas 2D starfield can hold the performance budget on a mid-tier mobile device without harming Interaction to Next Paint. `Falsified` by `SINGULARITY-005`; the static artwork ships instead.
+3. A Canvas 2D starfield can hold the performance budget on a mid-tier mobile device without harming Interaction to Next Paint. `Falsified` by `SINGULARITY-005`; a compositor-only CSS layer ships instead.
 4. Turning on TypeScript `strict: true` is a bounded change after the legacy content stack is removed.
 5. Dynamic Open Graph image generation works with self-hosted fonts under the Vercel Node runtime.
 

@@ -12,7 +12,7 @@ export default function UsesPage() {
     <>
       <header className="py-rhythm-7 sm:py-rhythm-8 max-w-[68ch]">
         <p className="text-small text-accent font-sans font-semibold uppercase">Uses</p>
-        <h1 className="text-heading-1 mt-rhythm-4 font-sans font-bold">Tools I work with</h1>
+        <h1 className="text-heading-1 mt-rhythm-4 font-title">Tools I work with</h1>
         <p className="text-lead text-ink-muted mt-rhythm-4 font-serif">
           A focused list of editors, shells, and development tools in my current workflow.
         </p>

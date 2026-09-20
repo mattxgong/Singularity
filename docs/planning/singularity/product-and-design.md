@@ -261,15 +261,26 @@ The accent is the risk. A cyan-white bright enough to feel like starlight on the
 
 `Evidence`: the current site uses Space Grotesk for everything, via `next/font/google` in [app/layout.tsx](../../../app/layout.tsx). A single geometric sans for both headings and long-form body text is the wrong tool for a site whose credibility rests on essays.
 
-Three faces, all self-hosted under the SIL Open Font License, all variable, all subsetted to Latin.
+Three text faces, all self-hosted under the SIL Open Font License, all variable, all subsetted to Latin. A fourth display face was added on 2026-09-19 for page titles only.
 
 | Role                   | Choice                                                                                                 | Rationale                                                                                                               |
 | ---------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | Body and prose         | A humanist or transitional serif with true italics and old-style numerals                              | Long-form reading. Old-style numerals matter because dates and measurements appear constantly in a resume-adjacent site |
 | Interface and headings | A neutral grotesque                                                                                    | Navigation, labels, metadata, buttons. Deliberately recessive so the serif carries the voice                            |
 | Code and data          | A monospace with clear zero disambiguation and programming ligatures available but disabled by default | Code blocks, technical labels, coordinate-style annotations                                                             |
+| Page titles            | Sterion, a wide unicase display face                                                                   | Gives the wordmark and page titles the instrument-panel character the observatory concept asks for                      |
 
-`Recommendation`: candidate faces are Source Serif 4, Inter, and JetBrains Mono, all OFL, all variable, all with mature subsetting. Final selection happens in `SINGULARITY-010` with licence verification as an explicit acceptance criterion.
+`Recommendation`: candidate faces are Source Serif 4, Inter, and JetBrains Mono, all OFL, all variable, all with mature subsetting. Final selection happens in `SINGULARITY-010` with licence verification as an explicit acceptance criterion. The interface slot was subsequently filled by IBM Plex Sans rather than Inter; see [typography-decision.md](typography-decision.md).
+
+The display face carries constraints the text faces do not, because it is unicase and decorative.
+
+- It is bound to `--font-title` and applied only to `h1` elements and the site wordmark. It never touches body copy, navigation, or any heading below level one.
+- It has no true lowercase. Every lowercase codepoint maps to an uppercase form, so titles render as capitals whatever the source casing.
+- It is not preloaded metrically. `adjustFontFallback` is off, because a decorative face has no sensible metric match in the fallback stack.
+- It is not applied to author-supplied titles. Post and project titles stay on the grotesque, because they are long, sentence-cased, and frequently hyphenated.
+
+> [!WARNING]
+> The shipped Sterion file is a personal-use trial. Its hyphen glyph contains a vendor watermark rather than a hyphen, measured at 1.42 times the width of a capital M. Either a commercial licence or an OFL substitute is required before launch. Tracked against `SINGULARITY-066`.
 
 `Recommendation`: adopt a fluid type scale using `clamp()` in the `@theme` block, sized so that body copy lands at 17 to 19 pixels across the viewport range and the measure stays between 60 and 75 characters. This borrows the fluid-scale principle demonstrated by `enscribe.dev` without borrowing its implementation.
 
@@ -305,23 +316,24 @@ Iconography is a single line-based set at a consistent stroke weight, imported p
 
 ### Motion
 
-Governed by D4. The ceiling was Canvas 2D, and `SINGULARITY-005` measured it over budget, so the shipped decoration is static.
+Governed by D4. The ceiling was Canvas 2D, and `SINGULARITY-005` measured it over budget. D4 was amended on 2026-09-19: what the measurement falsified was main-thread animation, so compositor-only CSS animation is permitted, because it consumes none of the frame budget that verdict governs.
 
-The starfield is a single isolated client leaf component. It renders into a fixed, full-viewport `<canvas>` behind all content, with `aria-hidden="true"`, `pointer-events: none`, and a `z-index` below every interactive layer. It never wraps content, so it cannot force parent components to become client components. This is what protects the seven-file client boundary documented in [research.md](research.md).
+The starfield is a Server Component rendering a fixed, full-viewport layer behind all content, with `aria-hidden="true"`, `pointer-events: none`, and a `z-index` below every interactive layer. It never wraps content, so it cannot force parent components to become client components. This is what protects the client boundary documented in [research.md](research.md).
+
+Depth comes from differential speed, not from geometry. Five tiled star layers drift at 600, 460, 380, 300, and 240 seconds per cycle, so nearer stars outrun distant ones and the field reads as parallax. Each layer overhangs the viewport by exactly one pattern tile and translates by exactly that tile, which closes the loop without a visible seam. Two of the layers also pulse between full and 45 percent opacity on 11 and 7 second periods, offset by negative delays so they never breathe in unison. The nebula wash, the coordinate grid, and the reticle stay fixed, so the instrument holds still while the sky moves behind it.
 
 Hard constraints, verified in `SINGULARITY-026`:
 
-- The Canvas implementation is not imported when `prefers-reduced-motion: reduce` is set. The small media-query mount still executes so it can select the static SVG fallback.
-- Mounted through `next/dynamic` with `ssr: false`, after first paint, so it is never on the Largest Contentful Paint critical path.
-- Suspended through `IntersectionObserver` and the `visibilitychange` event, a practice taken directly from the `prakhau143/Portfolio` accessibility notes.
-- Device pixel ratio capped at 2. Star count scales with viewport area and caps at 240.
-- Frame budget: under 2 milliseconds of main-thread time per frame on a mid-tier device.
-- Bundle budget: 8 KB gzipped, and 0 KB when reduced motion is requested.
-- Disabled entirely below the medium breakpoint. Mobile gets the static fallback. Phones are where the recruiter journey actually happens and where the battery cost is least justifiable.
+- No JavaScript at all: no canvas, no animation frame callback, no animation library, and no client component.
+- Animation touches only `transform` and `opacity`, the two properties the compositor owns, so the browser never runs it on the main thread.
+- The pulse animates whole layers rather than individual stars. Animating circles inside an SVG pattern would force the tile to re-rasterize every frame, which is paint work, not composited work.
+- Keyframes are declared inside `@media (prefers-reduced-motion: no-preference)`, so a reader requesting reduced motion never has the animation created rather than merely shortened.
+- Bundle budget: 0 KB gzipped, on every viewport and in both themes.
+- Colour comes from the semantic tokens, so the layer follows the theme without JavaScript.
 
 Interface motion beyond the starfield is CSS-only: transitions on colour, opacity, and transform, all at or under 200 milliseconds, all with a standard easing token, all suppressed under a global reduced-motion media query. No animation library is introduced, which keeps Singularity clear of the Motion and GSAP dependencies carried by two of the reference projects.
 
-`Recommendation`: no scroll-linked animation, no parallax, and no reveal-on-scroll. They fight the sixty-second skim, they are a common source of Cumulative Layout Shift, and they degrade badly under fast scrolling.
+`Recommendation`: no scroll-linked animation, no scroll-driven parallax, and no reveal-on-scroll. They fight the sixty-second skim, they are a common source of Cumulative Layout Shift, and they degrade badly under fast scrolling. The starfield parallax is time-driven and independent of scroll position, which is why it does not fall under this prohibition.
 
 ### Theming
 
@@ -337,12 +349,12 @@ This has one consequence worth stating. Because the page surface no longer track
 
 Breakpoints follow Tailwind defaults. No custom breakpoints are introduced.
 
-| Range            | Behaviour                                                                                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Below 640px      | Single column. Static SVG starfield. Table of contents collapsed into a disclosure. Navigation in the existing mobile sheet. Project cards full width. |
-| 640px to 1024px  | Two-column project grid. Navigation still in the sheet. Starfield still static.                                                                        |
-| 1024px to 1280px | Full horizontal navigation. Table of contents as a sticky sidebar. Three-column project grid.                                                          |
-| Above 1280px     | Wide container engages. Experience timeline gains its date gutter. Measure stays capped at 68ch regardless of available width.                         |
+| Range            | Behaviour                                                                                                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Below 640px      | Single column. Starfield renders as on every other viewport. Table of contents collapsed into a disclosure. Navigation in the existing mobile sheet. Project cards full width. |
+| 640px to 1024px  | Two-column project grid. Navigation still in the sheet. Starfield unchanged.                                                                                                   |
+| 1024px to 1280px | Full horizontal navigation. Table of contents as a sticky sidebar. Three-column project grid.                                                                                  |
+| Above 1280px     | Wide container engages. Experience timeline gains its date gutter. Measure stays capped at 68ch regardless of available width.                                                 |
 
 Mobile is the design target, not the fallback. J1 explicitly assumes a phone.
 
@@ -360,7 +372,7 @@ Focus indication uses the existing `:focus-visible` outline rule in [css/tailwin
 
 ### Screen readers
 
-One `<h1>` per page, with heading levels descending without gaps. Landmarks are explicit: `<header>`, `<nav>`, `<main>`, `<footer>`. The starfield canvas carries `aria-hidden="true"`. Decorative images take an empty `alt`. Every content image takes a meaningful `alt`, which is why the project cover type makes `alt` required rather than optional.
+One `<h1>` per page, with heading levels descending without gaps. Landmarks are explicit: `<header>`, `<nav>`, `<main>`, `<footer>`. The starfield layer carries `aria-hidden="true"`. Decorative images take an empty `alt`. Every content image takes a meaningful `alt`, which is why the project cover type makes `alt` required rather than optional.
 
 Icon-only controls carry an accessible name. `Evidence`: the existing components already do this correctly through `sr-only` spans and `aria-label` attributes in [components/social-icons/index.tsx](../../../components/social-icons/index.tsx) and [components/SearchButton.tsx](../../../components/SearchButton.tsx). Preserve the pattern.
 
@@ -368,7 +380,7 @@ The blog list search filter in [layouts/ListLayoutWithTags.tsx](../../../layouts
 
 ### Reduced motion
 
-A global `@media (prefers-reduced-motion: reduce)` rule sets animation and transition duration to near zero. The starfield module is not loaded at all. The `scroll-smooth` class currently on the `html` element in [app/layout.tsx](../../../app/layout.tsx) must be made conditional, because smooth scrolling is itself vestibular motion.
+A global `@media (prefers-reduced-motion: reduce)` rule sets animation and transition duration to near zero. The starfield goes further: its keyframes live inside a `no-preference` query, so the drift is never created rather than merely shortened, and the layer falls back to the artwork standing still. The `scroll-smooth` class currently on the `html` element in [app/layout.tsx](../../../app/layout.tsx) must be made conditional, because smooth scrolling is itself vestibular motion.
 
 ### Contrast and target size
 
@@ -376,9 +388,9 @@ Contrast minimums are tabulated in the colour section. Interactive targets are a
 
 ### Progressive enhancement and fallbacks
 
-The site must be fully usable with JavaScript disabled. Every core route is statically rendered, so navigation, reading, project browsing, and the resume download all work without client JavaScript. What degrades: the theme switch is unavailable and the page holds the default theme, the command palette is unavailable, the blog search filter is unavailable, and Giscus comments do not load. The decorative artwork is static SVG and renders regardless.
+The site must be fully usable with JavaScript disabled. Every core route is statically rendered, so navigation, reading, project browsing, and the resume download all work without client JavaScript. What degrades: the theme switch is unavailable and the page holds the default theme, the command palette is unavailable, the blog search filter is unavailable, and Giscus comments do not load. The decorative artwork is SVG animated by the stylesheet, so it renders and drifts regardless.
 
-Canvas is treated as optional, not assumed. If `getContext('2d')` returns null, the static SVG fallback remains. There is no WebGL path at all, so no WebGL fallback is required, which is a direct benefit of D4.
+There is no canvas and no WebGL path at all, so neither needs a fallback, which is a direct benefit of D4. A browser that cannot composite the drift still paints every layer; it loses the motion and nothing else.
 
 ## Success measurement
 

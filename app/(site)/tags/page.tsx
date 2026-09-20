@@ -13,7 +13,7 @@ export default function Page() {
 
   return (
     <section className="py-rhythm-7 sm:py-rhythm-8">
-      <h1 className="text-display text-ink font-sans font-bold">Tags</h1>
+      <h1 className="text-display text-ink font-title">Tags</h1>
       <p className="text-lead text-ink-muted mt-rhythm-4 max-w-[62ch] font-serif">
         Every topic covered in the writing, ordered by how often it appears.
       </p>

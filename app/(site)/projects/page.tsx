@@ -33,7 +33,7 @@ export default function Projects() {
     <div className="py-rhythm-7 sm:py-rhythm-8">
       <header className="space-y-rhythm-3 max-w-[68ch]">
         <p className="text-small text-accent font-sans font-semibold uppercase">Selected work</p>
-        <h1 className="text-heading-1 font-sans font-bold">Projects</h1>
+        <h1 className="text-heading-1 font-title">Projects</h1>
         <p className="text-lead text-ink-muted font-serif">
           Machine learning, robotics, and software systems built for measurable outcomes.
         </p>

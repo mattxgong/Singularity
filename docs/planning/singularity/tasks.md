@@ -326,6 +326,7 @@ The standalone prototype used 240 deterministic stars and capped device pixel ra
 - The complete prototype page was 3,620 bytes raw and 1,430 bytes gzipped. This conservative upper bound is below the 8 KB module budget.
 - Lighthouse 12.8.2 could not connect to either installed Chrome or cached Playwright Chromium through the local DevTools socket, matching the limitation recorded in [baseline-metrics.md](baseline-metrics.md). No Total Blocking Time result is available.
 - Verdict: use the static fallback on every viewport. The single-canvas design is cheaper than the layered design, but the 6-times traces exceed both the 2-millisecond frame budget and the 50-millisecond long-task threshold.
+- Verdict scope, recorded 2026-09-19. This measurement governs animation that runs on the main thread, which is what a canvas draw loop and a WebGL render loop both are. It says nothing about CSS animation of `transform` or `opacity`, which the browser composites off the main thread. `SINGULARITY-026` relies on that distinction; D4 was amended accordingly.
 - The temporary prototype was deleted after measurement.
 
 Risks and rollback. If the budget cannot be held, `SINGULARITY-026` ships only the static SVG. The design does not depend on animation, by deliberate construction, so this is a graceful loss rather than a redesign.
@@ -523,6 +524,8 @@ Scope. Selection and licence verification, recorded as a decision. Non-goals: do
 Files. A new `docs/planning/singularity/typography-decision.md`.
 
 Implementation notes. Requirements from [product-and-design.md](product-and-design.md): a humanist or transitional serif with true italics and old-style numerals for body copy, a neutral grotesque for interface text, and a monospace with a disambiguated zero for code. All three must be variable, must have mature Latin subsetting, and must be under the SIL Open Font License or an equivalently permissive licence. Candidates are Source Serif 4, Inter, and JetBrains Mono, all of which meet these criteria, but confirm rather than assume.
+
+Amendment, 2026-09-20. The interface face is now IBM Plex Sans, also OFL 1.1 and variable across 100 to 700. Inter met every criterion; the change was made for character rather than compliance, and is recorded in [typography-decision.md](typography-decision.md).
 
 Acceptance criteria.
 
@@ -1063,21 +1066,21 @@ Risks and rollback. Low. Rollback: revert the file.
 
 ### SINGULARITY-026 Starfield implementation and mount
 
-| Field      | Value                                                      |
-| ---------- | ---------------------------------------------------------- |
-| Phase      | P2                                                         |
-| Size       | M                                                          |
-| Depends on | SINGULARITY-005, SINGULARITY-017, SINGULARITY-018          |
-| Unlocks    | none                                                       |
-| Status     | Complete. Canvas withdrawn per the SINGULARITY-005 verdict |
+| Field      | Value                                                     |
+| ---------- | --------------------------------------------------------- |
+| Phase      | P2                                                        |
+| Size       | M                                                         |
+| Depends on | SINGULARITY-005, SINGULARITY-017, SINGULARITY-018         |
+| Unlocks    | none                                                      |
+| Status     | Complete. Amended 2026-09-19 to add compositor-only drift |
 
-Objective. Ship the decorative starfield within its hard budgets. `SINGULARITY-005` recorded a negative verdict for the Canvas prototype, so the rollback path in this task is the delivered path: the static SVG on every viewport.
+Objective. Ship the decorative starfield within its hard budgets. `SINGULARITY-005` recorded a negative verdict for the Canvas prototype, so nothing in this task may place work on the main thread.
 
-Scope. One component, the static SVG, rendered by the shell layout. Non-goals: the canvas implementation, the reduced-motion mount that chose between them, and any other animation.
+Scope. One component plus its stylesheet rules, rendered by the shell layout. Non-goals: the canvas implementation, the reduced-motion mount that chose between implementations, any animation library, and any animation of a property the compositor does not own.
 
-Files. `components/decorative/starfield-static.tsx`, `app/(site)/layout.tsx`.
+Files. `components/decorative/starfield.tsx`, `css/tailwind.css`, `app/(site)/layout.tsx`.
 
-Implementation notes. Render as a sibling of `{children}`, never as a wrapper, or the entire page subtree becomes client-rendered. The SVG uses the semantic colour tokens, so it follows both themes without JavaScript and needs no reduced-motion branch.
+Implementation notes. Render as a sibling of `{children}`, never as a wrapper, or the entire page subtree becomes client-rendered. The SVG uses the semantic colour tokens, so it follows both themes without JavaScript. Tile dimensions and cycle duration are set per layer as custom properties on the element, so the component stays the single source of truth and the stylesheet holds one generic keyframe.
 
 Acceptance criteria.
 
@@ -1085,6 +1088,10 @@ Acceptance criteria.
 - The artwork renders on every viewport and in both themes.
 - No canvas or animation-frame module is shipped.
 - The decorative layer contributes zero kilobytes of client JavaScript.
+- Animation is confined to `transform` and `opacity`, and the keyframes are declared inside `@media (prefers-reduced-motion: no-preference)`.
+- The opacity pulse is applied to whole layers, never to elements inside an SVG pattern.
+- Each drifting layer translates by exactly one pattern tile, so the loop closes without a visible seam.
+- The oversized layers are clipped by the container, so no viewport gains a horizontal scrollbar.
 - No page component became a client component as a result.
 - Home page Lighthouse performance does not regress from the `SINGULARITY-001` baseline.
 
@@ -1100,9 +1107,23 @@ Implementation evidence, 2026-09-19.
 
 - `SINGULARITY-005` measured the single-canvas prototype at 1.823 milliseconds mean and 2.8 milliseconds p95 under 6 times throttling, with one 81 millisecond long task, and 5.289 milliseconds mean with forty long tasks over five minutes. Both the 2 millisecond frame budget and the 50 millisecond long-task threshold failed.
 - An earlier implementation shipped the canvas above the medium breakpoint regardless. That contradicted the recorded verdict and has been withdrawn.
-- `components/decorative/starfield.tsx` and `components/decorative/star-field-mount.tsx` are deleted. The shell renders `StarfieldStatic` directly, which removed two client components from every route.
+- The canvas component and `components/decorative/star-field-mount.tsx` are deleted. The shell renders the starfield component directly, which removed two client components from every route.
 
-Risks and rollback. Reintroducing motion requires an amended `SINGULARITY-005` with measurements that clear both thresholds. Rollback: none needed; the static layer is the design's intended floor.
+Amendment, 2026-09-19. Depth restored without main-thread cost.
+
+The delivered flat layer read as a grid rather than as sky. `Mif2006/Space-Portolio`, studied in [research.md](research.md), gets its depth from 5,000 WebGL points rotating in a `useFrame` callback, which is the cost profile `SINGULARITY-005` rejected and roughly 200 KB gzipped besides. The transferable idea was the composition, not the technique: nearer stars move faster than distant ones.
+
+- The component now renders a nebula wash, five tiled star layers, and the original coordinate grid and reticle. Only the star layers move.
+- Layers drift at 600, 460, 380, 300, and 240 seconds per cycle. Each overhangs the viewport by one pattern tile and translates by exactly that tile, so the loop closes seamlessly.
+- The `starfield-drift` keyframe animates `transform` and the `starfield-twinkle` keyframe animates `opacity`. Both sit inside `@media (prefers-reduced-motion: no-preference)`. Under `reduce` no animation is created at all, rather than being clamped to 0.01ms by the global rule, which also prevents a pulsing layer from being frozen mid-fade.
+- Two layers carry the pulse, on 11 and 7 second periods with negative delays so their phases differ. The pulse is declared on the layer element, because animating circles inside the SVG pattern would re-rasterize the tile every frame.
+- Tile size and duration are set per layer through custom properties on the element, so the numbers live in one place.
+- The component remains a Server Component. `yarn check:client-boundary` still reports fourteen approved files, and the layer still ships zero kilobytes of JavaScript.
+- `yarn typecheck`, `yarn lint`, `yarn format:check`, and `yarn test` all pass. Both themes were verified in a browser at desktop width.
+- Outstanding: visual baselines need regeneration through `yarn test:visual:update`, because the artwork changed.
+- Renamed 2026-09-19. The component and its file are now `Starfield` and `components/decorative/starfield.tsx`. `StarfieldStatic` had stopped being true once the layer moved, and the file name collided conceptually with the deleted canvas component of the same name.
+
+Risks and rollback. Reintroducing main-thread motion still requires an amended `SINGULARITY-005` with measurements that clear both thresholds. Rollback for the drift alone: delete the `@media (prefers-reduced-motion: no-preference)` block in [css/tailwind.css](../../../css/tailwind.css), which returns the layer to standing still without touching the component.
 
 ### SINGULARITY-027 Rebuild the not-found page
 
@@ -2094,7 +2115,7 @@ Implementation evidence, 2026-09-19.
 
 - One route resolves published posts and projects to distinct 1200 by 630 PNG cards. `dynamicParams` is disabled, so unknown slugs return a 404.
 - Blog and project metadata reference canonical dynamic image URLs for Open Graph and Twitter. Other routes retain the static banner.
-- The shipped Inter asset is WOFF2-only, which Satori rejects with `Unsupported OpenType signature wOF2`. The route therefore uses Satori's bundled sans face rather than adding a second font binary. A compatible static Inter TTF or WOFF subset remains a visual follow-up.
+- The shipped interface asset is WOFF2-only, which Satori rejects with `Unsupported OpenType signature wOF2`. The route therefore uses Satori's bundled sans face rather than adding a second font binary. A compatible static TTF or WOFF subset of the interface face remains a visual follow-up. The face became IBM Plex Sans on 2026-09-20; the constraint is unchanged, because the swap did not alter the format.
 - Card colours now match the plate surface and the starlight accent rather than approximations of the starter palette.
 
 Correction, 2026-09-19. The first implementation declared `runtime = 'edge'`, which made the route dynamic and broke `EXPORT=1 UNOPTIMIZED=1 yarn build` with `Failed to collect page data for /og/[...slug]`. That regressed a `SINGULARITY-003` and `SINGULARITY-069` exit criterion without either task being reopened. The route is now prerendered on the Node runtime and both build profiles pass, emitting four cards into `out/og/`.
@@ -2964,6 +2985,7 @@ Acceptance criteria.
 - A search of the built output finds no phone number.
 - No placeholder text, no lorem ipsum, no starter copy anywhere.
 - Spelling and grammar pass on every page.
+- The Sterion display face is either commercially licensed or replaced. `Blocker` raised 2026-09-19: the shipped file is a personal-use trial whose hyphen glyph is a vendor watermark. Every other font in `public/fonts/` ships its OFL text alongside it; this one ships nothing.
 
 Validation.
 

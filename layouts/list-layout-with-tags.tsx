@@ -95,7 +95,7 @@ export default function ListLayoutWithTags({
 
   return (
     <section className="py-rhythm-7 sm:py-rhythm-8">
-      <h1 className="text-display text-ink font-sans font-bold">{title}</h1>
+      <h1 className="text-display text-ink font-title">{title}</h1>
       <div className="mt-rhythm-7 gap-rhythm-7 grid md:grid-cols-[13rem_minmax(0,1fr)]">
         <nav aria-label="Blog topics">
           <div className="md:hidden">

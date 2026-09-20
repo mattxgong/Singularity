@@ -30,11 +30,11 @@ const sourceSerifItalic = localFont({
   preload: false,
 })
 
-const inter = localFont({
-  src: '../public/fonts/inter-latin-wght-normal.woff2',
-  weight: '100 900',
+const ibmPlexSans = localFont({
+  src: '../public/fonts/ibm-plex-sans-latin-wght-normal.woff2',
+  weight: '100 700',
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-ibm-plex-sans',
   fallback: ['Arial'],
   adjustFontFallback: 'Arial',
   preload: true,
@@ -48,6 +48,18 @@ const jetbrainsMono = localFont({
   fallback: ['Courier New'],
   adjustFontFallback: false,
   preload: false,
+})
+
+// Display face for page titles only. Metric overrides are off because a decorative
+// face has no sensible metric match in the fallback stack.
+const sterion = localFont({
+  src: '../public/fonts/sterion.woff2',
+  weight: '400',
+  display: 'swap',
+  variable: '--font-sterion',
+  fallback: ['Georgia', 'serif'],
+  adjustFontFallback: false,
+  preload: true,
 })
 
 export const metadata: Metadata = {
@@ -99,7 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${sourceSerif.variable} ${sourceSerifItalic.variable} ${inter.variable} ${jetbrainsMono.variable} ${defaultThemeClass}`}
+      className={`${sourceSerif.variable} ${sourceSerifItalic.variable} ${ibmPlexSans.variable} ${jetbrainsMono.variable} ${sterion.variable} ${defaultThemeClass}`}
       suppressHydrationWarning
     >
       <link rel="icon" href={`${basePath}/static/favicons/favicon.ico`} sizes="16x16 32x32 48x48" />
