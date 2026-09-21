@@ -1,0 +1,223 @@
+---
+title: Neural Network Math
+date: '2026-09-20'
+tags: ['CNN', 'neural network', 'math']
+draft: true
+summary: The rather straightforward but easy to mess up math behind a simple neural network.
+featured: true
+---
+
+## Least Squares and Regression
+Suppose we have a linear equation $Y = B_0 + B_1x$ and we are modelling it with $\hat{y} = b_0 + b_1x$. We have the following observations: $(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)$. We want to find the least squares estimates of $b_0$ and $b_1$.
+
+We want to minimize the error or loss function which is 
+
+$$L = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2$$
+
+where $y_i$ is the $i$-th observation which corresponds to the input $x_i$. Substituting the value of $\hat{y}$ into the equation for the loss function, it can be viewed as a function of $b_0$ and $b_1$. Thus,
+
+$$L = \sum_{i=1}^{n}(y_i - b_0 - b_1x_i)^2$$
+
+To minimize the loss function, we set the first derivative to 0 and solve for the critical points. In order to do a derivative of $L$, we do a partial derivative of $L$ with respect to $b_0$ and $b_1$ which is a normal derivative but treating the other variable as a constant. Therefore,
+
+$$\frac{\partial L}{\partial b_0} = -2\sum_{i=1}^{n}(y_i - b_0 - b_1x_i) = 0$$
+
+$$\sum_{i=1}^{n}y_i - \sum_{i=1}^{n}b_1x_i - nb_0 = 0$$
+
+$$\frac{1}{n}\sum_{i=1}^{n}y_i - \frac{1}{n}\sum_{i=1}^{n}b_1x_i = b_0$$
+
+$$\bar{y} - b_1\bar{x} = b_0$$
+
+where $\bar{y}$ and $\bar{x}$ are the averages of $y$ and $x$ respectively. Another way of getting this result is thinking of expected value. The expected value of $x$ and $y$ is just their averages. Thus,
+
+$$EY = Eb_0 + Eb_1x$$
+
+$$\bar{y} = b_0 + b_1\bar{x}$$
+
+Now we can do the partial differentiation of $b_1$.
+
+$$\frac{\partial L}{\partial b_1} = -2\sum_{i=1}^{n}x_i(y_i - b_1x_i - b_0) = 0$$
+
+$$\sum_{i=1}^{n}x_iy_i - b_0\sum_{i=1}^{n}x_i - b_1\sum_{i=1}^{n}x_i^2 = 0$$
+
+$$\sum_{i=1}^{n}x_iy_i - \left(\frac{1}{n}\sum_{i=1}^{n}y_i - \frac{b_1}{n}\sum_{i=1}^{n}x_i \right)\sum_{i=1}^{n}x_i - b_1\sum_{i=1}^{n}x_i^2 = 0$$
+
+$$\sum_{i=1}^{n}x_iy_i - \frac{1}{n}\sum_{i=1}^{n}x_i\sum_{i=1}^{n}y_i + \frac{b_1}{n}\left(\sum_{i=1}^{n}x_i\right)^2 - b_1\sum_{i=1}^{n}x_i^2 = 0$$
+
+$$\sum_{i=1}^{n}x_iy_i - \frac{1}{n}\sum_{i=1}^{n}x_i\sum_{i=1}^{n}y_i = b_1\left(\sum_{i=1}^{n}x_i^2 - \frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2 \right)$$
+
+$$b_1 = \frac{\sum_{i=1}^{n}x_iy_i - \frac{1}{n}\sum_{i=1}^{n}x_i\sum_{i=1}^{n}y_i}{\sum_{i=1}^{n}x_i^2 - \frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2}$$
+
+We can stop here but notice that
+
+$$b_1 = \frac{\sum_{i=1}^{n}x_iy_i - \frac{2}{n}\sum_{i=1}^{n}x_i\sum_{i=1}^{n}y_i + \frac{1}{n}\sum_{i=1}^{n}x_i\sum_{i=1}^{n}y_i}{\sum_{i=1}^{n}x_i^2 - \frac{2}{n}(\sum_{i=1}^{n}x_i)^2 + \frac{1}{n}(\sum_{i=1}^{n}x_i)^2}$$
+
+$$= \frac{\sum_{i=1}^{n}x_iy_i - \sum_{i=1}^{n}\bar{x}y_i - \sum_{i=1}^{n}\bar{y}x_i + n\bar{x}\bar{y}}{\sum_{i=1}^{n}x_i^2 - 2\sum_{i=1}^{n}\bar{x}x_i + n\bar{x}^2}$$
+
+$$= \frac{\sum_{i=1}^{n}(x_iy_i - \bar{x}y_i - \bar{y}x_i + \bar{x}\bar{y})}{\sum_{i=1}^{n}(x_i^2 - 2\bar{x}x_i + \bar{x}^2)}$$
+
+$$= \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2} = \frac{S_{xy}}{S_{xx}}$$
+
+
+## Updating Regression Model
+In the scenario described aboved with $n$ data points, we know the following values:
+
+$$b_1 = \frac{\sum_{i=1}^{n}x_iy_i - \frac{1}{n}\sum_{i=1}^{n}x_i\sum_{i=1}^{n}y_i}{\sum_{i=1}^{n}x_i^2 - \frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2} = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2} = \frac{S_{xy}}{S_{xx}}$$
+
+$$b_0 = \bar{y} - b_1\bar{x}$$
+
+Say we added a new data point $(x_{n+1}, y_{n+1})$ and we wanted to update the model without having to recalculate everything. Thus, we want to find the new $b_0$ which we write as $b_0^\prime$ in terms of the original $b_0$. Notice that
+
+$$S_{xx}^\prime = \sum_{i=1}^{n+1}x_i^2 - \frac{1}{n+1}\left(\sum_{i=1}^{n+1}x_i\right)^2$$
+
+$$= \sum_{i=1}^{n}x_i^2 + x_{n+1}^2 - \frac{1}{n+1}\left(\sum_{i=1}^{n}x_i + x_{n+1}\right)^2$$
+
+$$= \sum_{i=1}^{n}x_i^2 + x_{n+1}^2 - \frac{1}{n+1}\left(\left(\sum_{i=1}^{n}x_i\right)^2 + 2x_{n+1}\sum_{i=1}^{n}x_i + x_{n+1}^2\right)$$
+
+$$= \sum_{i=1}^{n}x_i^2 + x_{n+1}^2 - \frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2 + \frac{1}{n(n+1)}\left(\sum_{i=1}^{n}x_i\right)^2 - \frac{2x_{n+1}}{n+1}\sum_{i=1}^{n}x_i - \frac{x_{n+1}^2}{n+1}$$
+
+$$= S_{xx} + \frac{1}{n+1}\left(\frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2 - 2x_{n+1}\sum_{i=1}^{n}x_i + nx_{n+1}^2\right)$$
+
+$$= S_{xx} + \frac{1}{n+1}\left(\frac{1}{n}\sum_{i=1}^{n}x_i - x_{n+1}\right)\left(\sum_{i=1}^{n}x_i - nx_{n+1}\right)$$
+
+$$= S_{xx} + \frac{1}{n(n+1)}\left(\sum_{i=1}^{n}x_i - nx_{n+1}\right)^2$$
+
+$$= S_{xx} + \frac{1}{n(n+1)}(n\bar{x} - nx_{n+1})^2$$
+
+$$= S_{xx} + \frac{n}{n+1}(\bar{x} - x_{n+1})^2$$
+
+Another potential route we could go down is the following:
+
+$$(n+1)S_{xx}^\prime = nS_{xx} + S_{xx} + \frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2 - 2x_{n+1}\sum_{i=1}^{n}x_i + nx_{n+1}^2$$
+
+$$= nS_{xx} + \sum_{i=1}^{n}x_i^2 - \frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2 + \frac{1}{n}\left(\sum_{i=1}^{n}x_i\right)^2 - 2x_{n+1}\sum_{i=1}^{n}x_i + nx_{n+1}^2$$
+
+$$= nS_{xx} + \sum_{i=1}^{n}x_i^2 - 2x_{n+1}\sum_{i=1}^{n}x_i + nx_{n+1}^2$$
+
+$$= nS_{xx} + \sum_{i=1}^{n}(x_i^2 - 2x_{n+1}x_i + x_{n+1}^2)$$
+
+$$= nS_{xx} + \sum_{i=1}^{n}(x_i - x_{n+1})^2$$
+
+From this, we can predict that $S_{xy}^\prime = S_{xy} + \frac{n}{n+1}(\bar{x} - x_{n+1})(\bar{y} - y_{n+1})$ or $(n+1)S_{xy}^\prime = nS_{xy} + \sum_{i=1}^{n}(x_i - x_{n+1})(y_i - y_{n+1})$.
+
+
+## Backpropagation
+
+Consider the simplest case of a neural network, with only two layers: input and output layers. To do this, we need to define some variables:
+
+$$a_{i}^{\ell} - \text{The activation value of } i\text{th node in the } \ell\text{th layer}$$ 
+
+$$z_{i}^{\ell} - \text{The weighted value of } i\text{th node in the } \ell\text{th layer}$$ 
+
+$$b_{i}^{\ell} - \text{The bias of } i\text{th node in the } \ell\text{th layer}$$ 
+
+$$w_{ij}^{\ell} - \text{The weight connecting the } j\text{th node in the } (\ell-1)\text{th layer to the } i\text{th node in the } \ell\text{th layer}$$
+
+$$N_\ell - \text{The number of nodes in the } \ell\text{th layer}$$
+
+$$\sigma - \text{The activation function}$$
+
+$$C - \text{The cost value}$$
+
+$$L - \text{The number of layers/The output layer's number}$$
+
+From this, we can set up some initial equations:
+
+$$z_{i}^{\ell} = \sum_{j = 1}^{N_{\ell-1}}w_{ij}^{\ell}a_{j}^{\ell-1} + b_i^{\ell}$$
+
+$$a_i^\ell = \sigma(z_i^\ell)$$
+
+Letting $y_i$ be the desired output for $i$th output node and using squared loss cost function:
+
+$$C = \frac{1}{2}\sum_{i=0}^{N_L}(a_i^L - y_i)^2$$
+
+Since we are doing backpropagation which uses gradient descent, we need to know $\frac{\partial C}{\partial w_{ij}^L}$.
+
+$$\frac{\partial C}{\partial w_{ij}^L} = \frac{\partial \frac{1}{2}\sum_{k=1}^{N_L}(a_k^L - y_k)^2}{\partial w_{ij}^L}$$
+
+Make sure to pay special attention to the variable you use for the summation. Don't use the ones already established, such as $i$ or $j$, and use another like $k$.
+
+$$= \frac{\sum_{k=1}^{N_L}(a_k^L - y_k)\partial a_k^L}{\partial w_{ij}^L}$$
+
+$$= \sum_{k=1}^{N_L}(a_k^L - y_k)\frac{\partial a_k^L}{\partial w_{ij}^L}$$
+
+$$\frac{\partial a_k^L}{\partial w_{ij}^L} = \frac{\partial \sigma(z_k^{L})}{\partial w_{ij}^L}$$\
+
+$$= \sigma^\prime(z_k^{L})\frac{\partial z_k^L}{\partial w_{ij}^L}$$
+
+$$= \sigma^\prime(z_k^{L})\sum_{m=1}^{N_{L-1}}\frac{\partial (w_{km}^{L}a_{m}^{L-1} + b_m^{L})}{\partial w_{ij}^L}$$
+
+Notice that no matter what $m$ is, the derivative of $a_m^{L-1}$ and $b_m^L$ with respect to $w_{ij}^L$ will always be zero since they are completely unrelated to $w_{ij}^L$. Furthermore, the same is true for $w_{km}^L$ except when $m = j$. Thus, this degenerates to
+
+$$= \sigma^\prime(z_k^L)\frac{\partial w_{kj}^La_m^{L-1}}{\partial w_{ij}^L}$$
+
+$$\frac{\partial C}{\partial w_{ij}^L} = \sum_{k=1}^{N_L}(a_k^L - y_k)\sigma^\prime(z_k^L)\frac{\partial w_{kj}^La_j^{L-1}}{\partial w_{ij}^L}$$
+
+Similarly, the derivative of $w_{kj}^L$ with respect to $w_{ij}^L$ is zero except when $k = i$. Thus, this degenerates to
+
+$$= (a_i^L - y_i)\sigma^\prime(z_i^L)a_j^{L-1}$$
+
+In this simplified case of two layers, $a_j^{L-1}$ would be the value of the $j$th input node. We can see that the derivative is product of the error term of $i$th output node, the derivative of the activation function at the weighted value of the $i$th output node, and activated value of $j$th node of the previous layer.
+
+To make sense of this, think of the definition of the derivative. It is how much a change in the weight would affect the cost. So obviously, it only considers values that the weight is connected to, such as the node from the previous layer and how much the output differs from the expected. Other values, like the other output nodes, weights, activation values are not affected by a change in the current weight so they are not considered.
+
+Now, we must look at networks with more than two layers. Consider one with three layers. We want to know $\frac{\partial a_k^L}{\partial w_{ij}^\ell}$ when $\ell = L-1$:
+
+$$\frac{\partial a_k^L}{\partial w_{ij}^{L-1}} =\sigma^\prime(z_k^{L})\frac{\partial z_k^L}{\partial w_{ij}^{L-1}}$$
+
+$$= \sigma^\prime(z_k^{L})\sum_{m=1}^{N_{L-1}}\frac{\partial (w_{km}^{L}a_{m}^{L-1})}{\partial w_{ij}^{L-1}} = \sigma^\prime(z_k^{L})\frac{\partial w_{ki}^La_i^{L-1}}{\partial w_{ij}^{L-1}} = \sigma^\prime(z_k^{L})w_{ki}^L\sigma^\prime(z_i^{L-1})a_j^{L-2}$$
+
+$$\frac{\partial C}{\partial w_{ij}^\ell} = \sigma^\prime(z_i^{L-1})a_j^{L-2}\sum_{k=1}^{N_L}(a_k^L - y_k)\sigma^\prime(z_k^{L})w_{ki}^L$$
+
+For a more general case, we need to consider the chain rule:
+
+$$\frac{\partial C}{\partial w_{ij}^\ell} = \frac{\partial C}{\partial z_i^\ell}\frac{\partial z_i^\ell}{\partial w_{ij}^\ell} \text{ and let } \delta_i^\ell = \frac{\partial C}{\partial z_i^\ell}$$
+
+Notice if $\ell < L$, then
+
+$$\delta_i^\ell = \sum_{l=1}^{N_{\ell+1}}\frac{\partial C}{\partial z_l^{\ell+1}}\frac{\partial z_l^{\ell+1}}{\partial z_i^\ell}$$
+
+$$= \sum_{l=1}^{N_{\ell+1}}\delta^{\ell+1}_l\frac{\partial z_l^{\ell+1}}{\partial z_i^\ell}$$
+
+$$= \sum_{l=1}^{N_{\ell+1}}\delta^{\ell+1}_lw_{li}^{\ell+1}\frac{\partial a_i^{\ell}}{\partial z_i^\ell}$$
+
+$$= \sum_{l=1}^{N_{\ell+1}}\delta^{\ell+1}_lw_{li}^{\ell+1}\sigma^\prime(z_i^\ell)$$
+
+$$= \sigma^\prime(z_i^\ell) \sum_{l=1}^{N_{\ell+1}}\delta^{\ell+1}_lw_{li}^{\ell+1}$$
+
+So for a hidden layer,
+
+$$\frac{\partial C}{\partial w_{ij}^\ell} = \delta^\ell_ia_j^{\ell-1} = a_j^{\ell-1}\sigma^\prime(z_i^\ell) \sum_{l=1}^{N_{\ell+1}}\delta^{\ell+1}_lw_{li}^{\ell+1}$$
+
+While for the output layer,
+
+$$\frac{\partial C}{\partial w_{ij}^L} = \delta^L_ia_j^{L-1} = a_j^{L-1}(a_i^L - y_i)\sigma^\prime(z_i^L)$$
+
+Trying this with $\ell = L-1$ as with our previous example:
+
+$$\frac{\partial C}{\partial w_{ij}^\ell} = \delta^{L-1}_ia_j^{L-2} = a_j^{L-2}\sigma^\prime(z_i^{L-1}) \sum_{l=1}^{N_L}\delta^L_lw_{li}^L$$
+
+$$= \sigma^\prime(z_i^{L-1})a_j^{L-2}\sum_{l=1}^{N_L}(a_l^L - y_l)\sigma^\prime(z_l^L)w_{li}^L$$
+
+These match!
+
+
+## Batch Normalization
+
+For a random normal variable, let their mean or expected value be $\mu$ and their standard deviation be $\sigma$. A standardized normal variable is one where $\mu = 0$ and $\sigma = 1$. So how do we transform a random normal variable $X$ into a standardized one? We can do the following:
+
+$$X_i^\prime = \frac{X_i - \mu}{\sigma}$$
+
+Notice that:
+
+$$E(X^\prime) = \frac{E(X) - \mu}{\sigma} = \frac{\mu - \mu}{\sigma} = 0$$
+
+Using the definition of variance which is equal to the variance squared,
+
+$$\text{Var}(X^\prime) = \frac{1}{N}\sum_{i=0}^N (X_i^\prime - E(X^\prime))$$
+
+$$= \frac{1}{N}\sum_{i=0}^N (\frac{X_i - \mu}{\sigma})$$
+
+$$= \frac{1}{\sigma^2}\left(\frac{1}{N}\sum_{i=0}^N (X_i - \mu)^2\right)$$
+
+$$= \frac{1}{\sigma^2}\text{Var}(X) = \frac{1}{\sigma^2}\sigma^2 = 1$$

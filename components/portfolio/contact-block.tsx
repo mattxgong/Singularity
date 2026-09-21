@@ -10,7 +10,7 @@ export function ContactBlock({ email }: ContactBlockProps) {
       <div className="gap-rhythm-6 flex flex-col justify-between sm:flex-row sm:items-end">
         <div className="max-w-[60ch]">
           <h2 className="text-heading-2 text-ink font-sans font-bold">
-            Let&rsquo;s build something
+            Let&rsquo;s build something together.
           </h2>
           <p className="text-lead text-ink-muted mt-rhythm-3 font-serif">
             I&rsquo;m open to conversations about software, applied machine learning, and ambitious
@@ -18,7 +18,7 @@ export function ContactBlock({ email }: ContactBlockProps) {
           </p>
         </div>
         <Button href={`mailto:${email}`} className="shrink-0">
-          {email}
+          Contact Me
         </Button>
       </div>
     </section>

@@ -9,10 +9,10 @@ export const metadata = genPageMetadata({
 })
 
 const statusLabels: Record<Project['status'], string> = {
-  active: 'Current work',
+  active: 'Current Work',
   archived: 'Archive',
-  competition: 'Competition work',
-  shipped: 'Shipped work',
+  competition: 'Competition Work',
+  shipped: 'Shipped Work',
 }
 
 export default function Projects() {
@@ -32,7 +32,7 @@ export default function Projects() {
   return (
     <div className="py-rhythm-7 sm:py-rhythm-8">
       <header className="space-y-rhythm-3 max-w-[68ch]">
-        <p className="text-small text-accent font-sans font-semibold uppercase">Selected work</p>
+        <p className="text-small text-accent font-sans font-semibold uppercase">Selected Work</p>
         <h1 className="text-heading-1 font-title">Projects</h1>
         <p className="text-lead text-ink-muted font-serif">
           Machine learning, robotics, and software systems built for measurable outcomes.

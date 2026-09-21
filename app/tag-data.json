@@ -1,5 +1,8 @@
 {
   "ai-agents": 1,
+  "cnn": 1,
+  "math": 1,
+  "neural-network": 1,
   "systems": 1,
   "tooling": 1
 }

@@ -21,16 +21,16 @@ export default function Page() {
     <>
       <Hero profile={profile} />
 
-      <Section heading="Featured work">
+      <Section heading="Featured Work">
         <ProjectGrid projects={featuredProjects} />
         <div className="mt-rhythm-6">
           <Button href="/projects" variant="ghost">
-            All projects
+            All Projects
           </Button>
         </div>
       </Section>
 
-      <Section heading="Recent writing">
+      <Section heading="Recent Writing">
         <ol className="border-boundary divide-boundary divide-y border-y">
           {recentPosts.map((post) => (
             <li key={post.slug}>
@@ -55,7 +55,7 @@ export default function Page() {
         </ol>
         <div className="mt-rhythm-6">
           <Button href="/blog" variant="ghost">
-            All writing
+            All Writing
           </Button>
         </div>
       </Section>

@@ -50,7 +50,7 @@ export default function Page() {
         </div>
       </Section>
 
-      <Section heading="Education and recognition">
+      <Section heading="Education and Recognition">
         {education.map((entry) => (
           <article key={entry.degree} className="mb-rhythm-6">
             <h3 className="text-heading-4 font-sans font-semibold">{entry.degree}</h3>
@@ -71,10 +71,21 @@ export default function Page() {
         </ul>
       </Section>
 
-      <Section heading="Away from the screen">
+      <Section heading="Away From the Screen">
+        <p
+          className="text-lead text-ink-muted max-w-[68ch] font-serif"
+          style={{ marginBottom: '30px' }}
+        >
+          I am an avid sports fan, both in terms of playing and watching. In particularly, I play
+          tennis, pickleball, and ultimate frisbee as well as skiing, snowboarding, and swimming. I
+          enjoy watching American football (NFL) and basketball (NBA). Go Bills!
+        </p>
         <p className="text-lead text-ink-muted max-w-[68ch] font-serif">
-          I play ultimate frisbee and tennis, ski and snowboard, swim, play guitar and piano, and
-          enjoy escape rooms.
+          I'm also a fan of puzzles (especially escape rooms), history, mythology, anthropology, and
+          trivia in general. I love learning about obscure and fascinating things and ideas from our
+          past and what our predecessors did and believed in, some of which we have carried on to
+          our present. The stories of yesteryears are the record by which our ancestors marked their
+          lives.
         </p>
       </Section>
     </>

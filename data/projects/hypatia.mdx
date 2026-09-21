@@ -1,0 +1,49 @@
+## Description
+A cross-platform desktop app for building persistent study wikis from course materials. Hypatia is an LLM-powered study wiki builder. Upload lecture videos, notes, PDFs, and slides, then browse, search, and chat with the interlinked knowledge base that Hypatia maintains.
+
+## How It Works
+Hypatia lets you create **Classes**, independent study wikis backed by their own repositories of source material. When you upload files, the LLM reads and synthesizes them into a persistent, interlinked wiki of Markdown pages. Unlike RAG systems that derive answers from raw documents on every query, Hypatia incrementally maintains this wiki so your knowledge base grows over time.
+
+You interact with each Class through a chat interface that supports natural-language queries, summarization, and wiki management commands.
+
+## Features
+* **Multi-format ingestion**: Upload PDFs, DOCX, PPTX, XLSX, video, audio, images, Markdown, and plain text
+* **LLM wiki generation**: Build interlinked wiki pages from your sources
+* **Chat interface**: Ask questions, get cited answers, and run management commands
+* **Full-text search**: Search all wiki pages through FTS5
+* **Version history**: Track wiki revisions and roll back through Git
+* **Multiple LLM providers**: Use GitHub Copilot, Copilot with Ollama, Anthropic, OpenAI, or native Ollama
+* **Backup and restore**: Export and import complete Classes as ZIP archives
+* **Cross-platform desktop app**: Run on Windows, macOS, and Linux
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Flutter Frontend                     │
+│  ┌──────────┐   ┌───────────────┐   ┌────────────────┐  │
+│  │ Sidebar  │   │  Wiki Viewer  │   │  Chat Panel    │  │
+│  │ - Class  │   │  - Markdown   │   │  - /ask        │  │
+│  │   select │   │  - Citations  │   │  - /summarize  │  │
+│  │ - Wiki   │   │  - Deep links │   │  - /remove     │  │
+│  │   tree   │   │               │   │  - File upload │  │
+│  │ - Search │   │               │   │                │  │
+│  └──────────┘   └───────────────┘   └────────────────┘  │
+└──────────────────────┬──────────────────────────────────┘
+                       │ HTTP / WebSocket
+┌──────────────────────┴──────────────────────────────────┐
+│                   FastAPI Backend                       │
+│  ┌────────────┐  ┌──────────────┐  ┌─────────────────┐  │
+│  │  Routers   │  │   Services   │  │   Storage       │  │
+│  │ - classes  │  │ - wiki_engine│  │ - raw/          │  │
+│  │ - files    │  │ - converter  │  │ - wiki/         │  │
+│  │ - wiki     │  │ - video_proc │  │ - converted/    │  │
+│  │ - chat     │  │ - llm        │  │ - thumbnails/   │  │
+│  └────────────┘  │ - search     │  └─────────────────┘  │
+│                  └──────────────┘                       │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │              SQLite Database                     │   │
+│  │  classes | files | wiki_pages | chat_history     │   │
+│  └──────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+```

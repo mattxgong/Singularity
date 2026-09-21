@@ -2,7 +2,7 @@ import type { SkillGroup } from './types'
 
 const skillGroups = [
   {
-    label: 'Programming languages',
+    label: 'Programming Languages',
     skills: [
       'Python',
       'C++',
@@ -14,31 +14,39 @@ const skillGroups = [
       'CSS',
       'HTML',
       'C',
-      'R',
+      'C#',
+      'Dart',
     ].map((name) => ({ name, primary: ['Python', 'C++', 'TypeScript', 'SQL'].includes(name) })),
   },
   {
-    label: 'Libraries and frameworks',
+    label: 'Libraries and Frameworks',
     skills: [
+      'Copilot SDK',
       'PyTorch',
       'Google Agent Development Kit',
-      'multi-agent systems',
+      'Multi-Agent Systems',
       'Hugging Face',
       'TensorFlow',
       'Node.js',
       'Puppeteer',
       'React',
+      'Next.js',
+      'numpy',
       'pandas',
     ].map((name) => ({
       name,
-      primary: ['PyTorch', 'Google Agent Development Kit', 'multi-agent systems', 'React'].includes(
-        name
-      ),
+      primary: ['Copilot SDK', 'PyTorch', 'Google Agent Development Kit', 'React'].includes(name),
     })),
   },
   {
-    label: 'Tools and platforms',
+    label: 'Tools and Platforms',
     skills: [
+      'GitHub Copilot',
+      'Claude Code',
+      'Ollama',
+      'Azure DevOps',
+      'AWS',
+      'Llama.cpp',
       'Git',
       'Linux',
       'ROS',
@@ -47,7 +55,6 @@ const skillGroups = [
       'Power BI',
       'Power Apps',
       'Power Automate',
-      'AWS',
       'Docker',
       'SAP',
       'Anaconda',
@@ -55,7 +62,10 @@ const skillGroups = [
       '.NET',
       'Xcode',
       'Unity',
-    ].map((name) => ({ name, primary: ['Git', 'Linux', 'ROS', 'Docker'].includes(name) })),
+    ].map((name) => ({
+      name,
+      primary: ['GitHub Copilot', 'Claude Code', 'AWS', 'ROS'].includes(name),
+    })),
   },
 ] satisfies SkillGroup[]
 
