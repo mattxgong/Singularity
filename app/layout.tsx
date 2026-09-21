@@ -1,6 +1,7 @@
 import 'css/tailwind.css'
 import 'css/fonts.css'
 import 'remark-github-blockquote-alert/alert.css'
+import 'katex/dist/katex.min.css'
 
 import localFont from 'next/font/local'
 import { SpeedInsights } from '@vercel/speed-insights/next'
