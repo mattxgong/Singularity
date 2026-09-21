@@ -70,7 +70,7 @@ export default function PostLayout({
         <BlogTableOfContents toc={toc} presentation="mobile" />
         <div className="divide-boundary/25 pb-rhythm-6 divide-y">
           <div className="gap-rhythm-7 grid lg:grid-cols-[minmax(0,1fr)_16rem]">
-            <Prose className="py-rhythm-7 min-w-0">{children}</Prose>
+            <Prose className="prose-fluid py-rhythm-7 min-w-0">{children}</Prose>
             <BlogTableOfContents toc={toc} presentation="desktop" />
           </div>
           <div className="py-rhythm-5 text-small text-ink-muted font-sans">

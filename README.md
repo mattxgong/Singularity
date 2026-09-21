@@ -1,6 +1,6 @@
 ---
 title: Singularity
-description: Matthew Gong's personal portfolio and technical blog, built on Next.js with a static-first architecture and an observatory visual identity
+description: My personal portfolio and technical blog, built on Next.js with a static-first architecture and an observatory visual identity
 author: Matthew Gong
 ms.date: 2026-09-19
 ms.topic: overview
@@ -16,13 +16,9 @@ estimated_reading_time: 7
 
 ## Overview
 
-Singularity is Matthew Gong's personal portfolio and technical blog. Projects and writing are peers rather than parent and child: the portfolio leads, and the essays carry the technical depth.
-
 The site is statically rendered, self-hosts its typefaces, and ships a deliberately small client bundle. The visual identity is an observatory rather than outer space, which means charts over photographs, annotation over ornament, and colour reserved for meaning. Dark is the default theme; light is a photographic plate rather than an inverted compromise.
 
-Current preview: [mattxgong-singularity.vercel.app](https://mattxgong-singularity.vercel.app). The production domain is still open, tracked as `OQ-2` in [docs/planning/singularity/risks-and-decisions.md](docs/planning/singularity/risks-and-decisions.md).
-
-Planning, architecture, and design documents live in [docs/planning/singularity/](docs/planning/singularity/README.md).
+Current preview: [mattxgong-singularity.vercel.app](https://mattxgong-singularity.vercel.app).
 
 ## Prerequisites
 
@@ -160,12 +156,4 @@ Deploy the generated `out` folder. A [`pages.yml`](.github/workflows/pages.yml) 
 
 Released under the [MIT License](LICENSE).
 
-Singularity is a substantial rewrite of the [Tailwind Next.js Starter Blog](https://github.com/timlrx/tailwind-nextjs-starter-blog) by Timothy Lin, which is also MIT licensed. That obligation survives the rebranding, so the upstream copyright notice is retained in [LICENSE](LICENSE) alongside the notice for this work, and the credit is repeated in the site footer.
-
-### Typefaces
-
-Source Serif 4, Inter, and JetBrains Mono are self-hosted under the SIL Open Font License 1.1. Versions, licence links, and the payload budget are recorded in [docs/planning/singularity/typography-decision.md](docs/planning/singularity/typography-decision.md).
-
-### Content and identity
-
-The MIT licence covers the source code. It does not cover the writing, the project case studies, the resume, the photographs, or the Singularity mark and its derived icons. Those remain the property of Matthew Gong and are not licensed for reuse.
+Singularity is based off of the [Tailwind Next.js Starter Blog](https://github.com/timlrx/tailwind-nextjs-starter-blog) by Timothy Lin, which is also MIT licensed. That obligation survives the rebranding, so the upstream copyright notice is retained in [LICENSE](LICENSE) alongside the notice for this work, and the credit is repeated in the site footer.

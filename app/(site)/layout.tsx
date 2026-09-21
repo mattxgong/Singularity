@@ -23,7 +23,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <SkipLink />
       <Starfield />
       <div className="relative z-10">
-        <Container>
+        <Container width="wide">
           <SearchProvider>
             <Header />
             <main id="main-content" tabIndex={-1} className="mb-auto">

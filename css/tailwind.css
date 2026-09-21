@@ -203,6 +203,10 @@ html.dark .markdown-alert.markdown-alert-important .markdown-alert-title {
     font-size: var(--text-body);
     font-variant-numeric: oldstyle-nums proportional-nums;
 
+    &.prose-fluid {
+      max-width: none;
+    }
+
     & a {
       color: var(--color-accent);
       text-decoration-thickness: 0.08em;
